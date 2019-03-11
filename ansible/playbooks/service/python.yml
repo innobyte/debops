@@ -12,3 +12,7 @@
 
     - role: debops.python
       tags: [ 'role::python', 'skip::python' ]
+      python__dependent_packages3:
+        - '{{ librenms__python__dependent_packages3 }}'
+      python__dependent_packages2:
+        - '{{ librenms__python__dependent_packages2 }}'
