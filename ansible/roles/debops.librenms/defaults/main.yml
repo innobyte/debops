@@ -18,7 +18,7 @@
 # List of base packages required by LibreNMS.
 librenms__base_packages:
   - [ 'snmp', 'imagemagick', 'fping', 'whois', 'mtr-tiny',
-      'rrdtool', 'nmap', ]
+      'rrdtool', 'nmap', 'python-mysqldb']
   - '{{ "snmp-mibs-downloader"
         if (ansible_local|d() and ansible_local.apt|d() and
             (ansible_local.apt.nonfree|d())|bool)
@@ -40,7 +40,7 @@ librenms__python__dependent_packages3:
 # .. envvar:: librenms__python__dependent_packages2 [[[
 #
 # Configuration for the :ref:`debops.python` Ansible role.
-librenms__python__dependent_packages2:
+librenms__python__dependent_package2:
 
   - 'python-mysqldb'
 
