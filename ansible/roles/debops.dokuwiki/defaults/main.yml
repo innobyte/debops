@@ -130,7 +130,26 @@ dokuwiki__git_checkout: '{{ dokuwiki__www + "/sites/" + dokuwiki__domains[0] + "
 # .. envvar:: dokuwiki__base_packages [[[
 #
 # List of base APT packages to install for DokuWiki support.
-dokuwiki__base_packages: [ 'python-docutils', 'curl' ]
+dokuwiki__base_packages: [ 'curl' ]
+
+                                                                   # ]]]
+# Configuration variables for other Ansible roles [[[
+# ---------------------------------------------------
+
+# .. envvar:: dokuwiki__python__dependent_packages3 [[[
+#
+# Configuration for the :ref:`debops.python` Ansible role.
+dokuwiki__python__dependent_packages2:
+
+  - 'python-docutils'
+
+                                                                   # ]]]
+# .. envvar:: dokuwiki__python__dependent_packages2 [[[
+#
+# Configuration for the :ref:`debops.python` Ansible role.
+dokuwiki__python__dependent_packages3:
+
+  - 'python-docutils'
 
                                                                    # ]]]
 # .. envvar:: dokuwiki__packages [[[
