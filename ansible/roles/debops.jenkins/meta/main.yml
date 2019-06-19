@@ -1,0 +1,30 @@
+---
+
+dependencies:
+  - role: debops.secret
+
+  - role: debops.apt
+    apt_repositories:
+      - repo: 'ppa:nginx/stable'
+        state: 'present'
+
+#   - role: debops.etc_services
+#     etc_services_dependent_list:
+#       - name: 'jenkins'
+#         port: '{{ jenkins__port }}'
+#         comment: 'Jenkins'
+
+  - role: debops.nginx
+    nginx_servers: [ '{{ jenkins__nginx__dependent_servers }}' ]
+    nginx_upstreams: [ '{{ jenkins__nginx__dependent_upstreams }}' ]
+    when: (jenkins_dependencies is defined and jenkins_dependencies)
+    tags: nginx
+
+#   - role: debops.ferm
+#     ferm_input_list:
+
+#       - type: 'dport_accept'
+#         dport: [ 'http-alt' ]
+#         saddr: '{{ jenkins_allow }}'
+#         filename: 'jenkins_dependency_accept'
+#         weight: '20'

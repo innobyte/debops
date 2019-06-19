@@ -1,0 +1,39 @@
+---
+
+- name: Manage Jenkins service
+  hosts: [ 'debops_service_jenkins', 'debops_jenkins' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: debops.java
+      tags: [ 'role::java', 'skip::java' ]
+      # java__install_jdk: True
+
+    - role: debops.jenkins
+      tags: [ 'role::jenkins', 'skip::jenkins' ]
+
+    - role: debops.nginx
+      tags: [ 'role::nginx', 'skip::nginx' ]
+      nginx__dependent_upstreams:
+        - '{{ jenkins__nginx__dependent_upstreams }}'
+      nginx__dependent_servers:
+        - '{{ jenkins__nginx__dependent_servers }}'
+
+    # - role: debops.apt_preferences
+    #   tags: [ 'role::apt_preferences', 'role::jenkins' ]
+    #   apt_preferences__dependent_list:
+    #     - '{{ nginx__apt_preferences__dependent_list }}'
+
+    - role: debops.ferm
+      tags: [ 'role::ferm', 'skip::ferm' ]
+      ferm__dependent_rules:
+        - '{{ jenkins__ferm__dependent_rules }}'
+
+    # - role: debops.secret
+    #   tags: [ role::secret', 'role::jenkins' ]
+    #   secret__directories:

@@ -1,0 +1,14 @@
+import jenkins.model.*
+
+//
+// Script Vars
+def git_descriptor = Jenkins.getInstance().getDescriptor("hudson.plugins.git.GitSCM")
+
+//
+// Main
+
+// Setup Global GIT
+git_descriptor.setGlobalConfigName('{{ jenkins_git_config_name }}')
+git_descriptor.setGlobalConfigEmail('{{ jenkins_git_config_email }}')
+
+git_descriptor.save()

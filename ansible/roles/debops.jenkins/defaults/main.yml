@@ -1,0 +1,341 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# debops.jenkins default variables [[[
+# ====================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../includes/global.rst
+
+
+# Domain name configuration [[[
+# -----------------------------
+
+# .. envvar:: jenkins__fqdn [[[
+#
+# String or list of the Fully Qualified domain names on which the Jenkins
+# application will be available, used by the webserver. The first item will be
+# used as the e-mail sender domain name.
+jenkins__fqdn: [ 'jenkins.{{ jenkins__domain }}' ]
+
+                                                                   # ]]]
+# .. envvar:: jenkins__domain [[[
+#
+# The DNS domain used by other variables in the ``debops.jenkins`` role.
+jenkins__domain: '{{ ansible_local.core.domain
+                    if (ansible_local|d() and ansible_local.core|d() and
+                        ansible_local.core.domain|d())
+                    else (ansible_domain if ansible_domain else ansible_hostname) }}'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# APT packages [[[
+# ----------------
+
+# .. envvar:: jenkins__base_packages [[[
+#
+# List of APT packages which are required by the Jenkins application.
+jenkins__base_packages: [ 'nginx' ]
+
+                                                                   # ]]]
+# Jenkins plugin configuration [[[
+# ---------------------------------
+
+# These variables specify what Jenkins plugins should be enabled on a given
+# host.
+
+# .. envvar:: jenkins__plugins [[[
+#
+# List of default Jenkins plugins enabled by this Ansible role.
+jenkins__plugins:
+  - git
+  - ssh
+  - timestamper
+  - jobConfigHistory
+  - audit-trail
+  - swarm
+  - email-ext
+  - build-timeout
+
+                                                                   # ]]]
+# .. envvar:: jenkins__port [[[
+#
+# Port number on which to connect to the server. You usually don't need to
+# change this.
+jenkins__port: '8080'
+
+                                                                   # ]]]
+# .. envvar:: jenkins_dependencies [[[
+#
+# Should the Jenkins role manage it's own dependencies?
+jenkins_dependencies: True
+                                                                   # ]]]
+                                                                   # ]]]
+# Application user, group, home [[[
+# ---------------------------------
+
+# .. envvar:: jenkins__user [[[
+#
+# Name of the UNIX system account used to manage Jenkins.
+jenkins__user: 'jenkins'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__group [[[
+#
+# Name of the UNIX primary group used to manage Jenkins.
+jenkins__group: 'jenkins'
+
+                                                                   # ]]]
+# .. envvar:: jenkins_mail_admin [[[
+#
+# E-mail address of the instance administrator, will be shown on each new pad
+# (see ``etherpad_welcome_text`` below).
+jenkins_mail_admin: 'jenkins@{{ ansible_domain }}'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__app_timeout [[[
+#
+# Number of seconds after which non-responsive worker threads will be killed
+# and restarted. Jenkins installations with lots of objects might require longer
+# timeouts for API access.
+jenkins__app_timeout: '900'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__nginx__dependent_upstreams [[[
+#
+# Configuration of the Jenkins nginx upstream, used by :ref:`debops.nginx`.
+jenkins__nginx__dependent_upstreams:
+
+  - name: 'jenkins'
+    server: '{{ jenkins_server_for_upstream }}'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__nginx__dependent_servers [[[
+#
+# Configuration of the Jenkins nginx server, used by :ref:`debops.nginx`.
+jenkins__nginx__dependent_servers:
+  - name: '{{ jenkins__fqdn }}'
+    type: 'proxy'
+    public_dir_name: 'current'
+    root_suffix: 'pub'
+    frame_options: '{{ omit }}'
+    content_type_options: '{{ omit }}'
+    xss_protection: '{{ omit }}'
+    proxy_pass: 'http://jenkins'
+    allow: '{{ jenkins_server__allow }}'
+    proxy_options: |
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout {{ jenkins__app_timeout }};
+        proxy_send_timeout {{ jenkins__app_timeout }};
+        proxy_read_timeout {{ jenkins__app_timeout }};
+        # add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
+ # ]]]
+
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: jenkins__ferm__dependent_rules [[[
+#
+# Configuration for :ref:`debops.ferm` Ansible role.
+jenkins__ferm__dependent_rules:
+
+  - type: 'accept'
+    dport: [ '8080' ]
+    saddr: '{{ jenkins_server__allow }}'
+    accept_any: True
+    weight: '50'
+    role: 'jenkins'
+
+  - type: 'accept'
+    dport: [ '80' ]
+    saddr: '{{ jenkins_server__allow }}'
+    accept_any: True
+    weight: '51'
+    role: 'jenkins2'
+
+  - type: 'accept'
+    dport: [ '443' ]
+    saddr: '{{ jenkins_server__allow }}'
+    accept_any: True
+    weight: '52'
+    role: 'jenkins3'
+
+                                                                   # ]]]
+# .. envvar:: jenkins_server__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Jenkins server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+jenkins_server__allow: [ '0.0.0.0/0' ]
+
+                                                                   # ]]]
+
+
+
+# nginx_www: '/var/run/jenkins/war'
+# nginx_webroot_create:
+
+
+jenkins_auth: True
+jenkins_role: 'server' # 'server' or 'slave' or define your own..
+
+# SMTP
+jenkins_admin_name: 'Jenkins CI'
+
+jenkins_smtp_host: 'localhost'
+jenkins_smtp_port: '25'
+jenkins_smtp_use_ssl: False
+jenkins_smtp_default_suffix: '@{{ ansible_domain }}'
+jenkins_smtp_reply_to_address: '{{ jenkins_mail_admin }}'
+
+# Git
+jenkins_git_config_name: 'Jenkins CI'
+jenkins_git_config_email: 'jenkins@{{ ansible_domain }}'
+
+jenkins_system_uid_gid: '1998'
+
+# Configure Jenkins withe jobs from the following repos
+jenkins_job_builder_repos:
+  - name: 'example'
+    repo: 'https://github.com/tobijb/jenkins-job-builder-example.git'
+    jenkins_url: '{{ jenkins_internal_service_url }}'
+    jobs_dir: 'jobs'
+    filters:
+      - 'development*'
+
+jenkins_group_groovy_scripts: []
+jenkins_host_groovy_scripts: []
+jenkins_group_plugins: []
+jenkins_host_plugins: []
+# Overload these two if you want to have different security configurations
+jenkins_security_check_groovy_script: check_if_security_is_enabled
+jenkins_security_enable_groovy_script: set_global_security_and_add_admin_user
+
+#-- User Defined (Infrequent)
+# Try this hard to connect to Jenkins after startup
+jenkins_connection_delay: 5
+jenkins_connection_retries: 10
+
+# External Jenkins service
+jenkins_external_service_scheme: 'http'
+jenkins_external_service_name: 'jenkins'
+jenkins_external_service_port: '8080'
+jenkins_external_service_fqdn: '{{ jenkins_external_service_name }}.{{ ansible_domain }}'
+# This URL should be directly accessible from your browser
+jenkins_external_service_url: '{{ jenkins_external_service_scheme }}://{{ jenkins_external_service_fqdn }}:{{ jenkins_external_service_port }}'
+
+# Internal Jenkins Service
+jenkins_internal_service_scheme: '{{ jenkins_external_service_scheme }}'
+jenkins_internal_service_name: '{{ jenkins_external_service_name }}'
+jenkins_internal_service_fqdn: '{{ jenkins_external_service_fqdn }}'
+jenkins_internal_service_port: '{{ jenkins_external_service_port }}'
+# This URL is used by jenkins-cli, jenkins-jobs, and ansible
+jenkins_internal_service_url: '{{ jenkins_internal_service_scheme }}://{{ jenkins_internal_service_fqdn }}:{{ jenkins_internal_service_port }}'
+
+# Global Jenkins Service
+jenkins_service_user: 'admin'
+jenkins_service_lookup_dir: '{{ secret }}/credentials/{{ jenkins_external_service_name }}.{{ ansible_domain }}/jenkins/{{ jenkins_service_user }}'
+jenkins_service_password: '{{ lookup("password", jenkins_service_lookup_dir + "/password chars=ascii,numbers") }}'
+jenkins_max_memory: '1024m'    # http://stackoverflow.com/questions/14763079/what-are-the-xms-and-xmx-parameters-when-starting-jvms
+jenkins_server_for_upstream: '127.0.0.1:8080'
+#jenkins_service_lookup_dir: '/var/lib/jenkins/secrets/initialAdminPassword'
+#jenkins_service_password: '{{ lookup("password", jenkins_service_lookup_dir + "/password chars=ascii,numbers") }}'
+
+
+#-- Jenkins Job Builder
+jenkins_hipchat_token: ""
+#-- Jenkins Groovy Script to run for against the Jenkins instance
+jenkins_groovy_scripts:
+  - set_global_email_configuration
+  - set_global_git_configuration # Must have git plugin above..
+
+# -- Jenkins task variables.. Shouldn't need to change any of these --
+jenkins_repo_url: 'deb http://pkg.jenkins-ci.org/debian binary/'
+jenkins_repo_key_url: 'https://jenkins-ci.org/debian/jenkins-ci.org.key'
+jenkins_ext_root: '/srv/jenkins'
+jenkins_ext_cli_root: '{{ jenkins_ext_root }}/jenkins-cli'
+jenkins_ext_groovy_root: '{{ jenkins_ext_root }}/jenkins-groovy'
+
+jenkins_ext_job_builder_root: '{{ jenkins_ext_root }}/jenkins-job-builder'
+jenkins_ext_job_builder_repos_dir: '{{ jenkins_ext_job_builder_root }}/repos'
+jenkins_ext_job_builder_config: '{{ jenkins_ext_job_builder_root }}/config.ini'
+jenkins_job_builder: 'jenkins-jobs --conf {{ jenkins_ext_job_builder_config }}'
+jenkins_job_builder_default_repo_dir: 'jobs'
+jenkins_job_builder_config_allow_duplicates: True
+
+# -- Jenkins Swarm related
+jenkins_ext_jenkins_swarm_root: '{{ jenkins_ext_root }}/jenkins-swarm-client'
+jenkins_swarm_client_url: 'http://maven.jenkins-ci.org/content/repositories/releases/org/jenkins-ci/plugins/swarm-client/1.24/swarm-client-1.24-jar-with-dependencies.jar'
+# This needs to be split out and joined in the task/template for group and host
+jenkins_swarm_labels_space_separated: 'swarm'
+# You can override this at the host var level
+jenkins_swarm_slave_executors: 1
+
+# -- Nginx Settings --
+# Domain which will be used for nginx server
+jenkins_nginx_auth_realm: 'Jenkins access is restricted'
+# Name of webserver access policy to enable (see 'debops.nginx' role)
+jenkins_nginx_access_policy: ""
+# nginx client_max_body_size value
+jenkins_nginx_client_max_body_size: '5m'
+# nginx - Jenkins proxy timeout in seconds
+jenkins_nginx_proxy_timeout: '300'
+
+# ---- Apt Repo for Nginx
+#deb http://nginx.org/packages/debian/ codename nginx
+#deb-src http://nginx.org/packages/debian/ codename nginx
+
+# ---- Web server ----
+
+# nginx upstream configuration for Jenkins service
+# jenkins__nginx__dependent_upstreams:
+#   enabled: True
+#   type: 'proxy'
+#   name: 'jenkins'
+#   server: '{{ jenkins_server_for_upstream }}'
+
+# nginx server configuration for Jenkins
+# jenkins__nginx__dependent_servers:
+#   -
+#     name: 'jenkins.innobyte.leo'
+#     type: 'proxy'
+#     public_dir_name: 'current'
+#     root_suffix: 'pub'
+#     frame_options: '{{ omit }}'
+#     content_type_options: '{{ omit }}'
+#     xss_protection: '{{ omit }}'
+#     proxy_pass: 'http://jenkins.innobyte.leo:8080/'
+#     proxy_options: |
+#       proxy_read_timeout 600s;
+
+#   by_role: 'debops.jenkins'
+#   enabled: True
+#   type: 'proxy'
+#   name:
+#     - '{{ jenkins_external_service_fqdn }}'
+
+# access_policy: '{{ jenkins_nginx_access_policy }}'
+# auth_basic_realm: '{{ jenkins_nginx_auth_realm }}'
+
+# error_pages:
+#     '502': '/502.html'
+
+# options: |
+#     client_max_body_size {{ jenkins_nginx_client_max_body_size }};
+# location:
+#     '/': |
+#       try_files $uri $uri/index.html $uri.html @jenkins;
+#     '@jenkins': |
+#       gzip off;
+#       proxy_read_timeout {{ jenkins_nginx_proxy_timeout }};
+#       proxy_connect_timeout {{ jenkins_nginx_proxy_timeout }};
+#       proxy_redirect     off;
+#       proxy_set_header   X-Forwarded-Proto $scheme;
+#       proxy_set_header   Host              $http_host;
+#       proxy_set_header   X-Real-IP         $remote_addr;
+#       proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+#       proxy_pass         http://jenkins;
