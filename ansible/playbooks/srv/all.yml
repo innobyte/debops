@@ -83,3 +83,9 @@
 - import_playbook: prosody.yml
 
 - import_playbook: freeradius.yml
+
+- import_playbook: influxdb.yml
+
+- import_playbook: telegraf.yml
+
+- import_playbook: grafana.yml

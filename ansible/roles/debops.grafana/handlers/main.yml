@@ -1,0 +1,10 @@
+---
+
+- name: restart grafana
+  service:
+    name: 'grafana-server'
+    state: 'restarted'
+    enabled: yes
+
+- name: update upgrade
+  command: apt-get update && apt-get upgrade

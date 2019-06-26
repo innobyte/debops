@@ -1,0 +1,22 @@
+---
+
+- name: Manage InfluxDB server
+  hosts: [ 'debops_service_influxdb', 'debops_influxdb' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: debops.python
+      tags: [ 'role::python', 'skip::python' ]
+
+    - role: debops.influxdb
+      tags: [ 'role::influxdb', 'skip::influxdb' ]
+
+    - role: debops.ferm
+      tags: [ 'role::ferm', 'skip::ferm' ]
+      ferm__dependent_rules:
+        - '{{ influxdb__ferm__dependent_rules }}'

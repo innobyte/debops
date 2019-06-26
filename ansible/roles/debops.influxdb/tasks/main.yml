@@ -1,0 +1,44 @@
+---
+- name: Add InfluxDB APT key
+  apt_key:
+    url: '{{ influxdb_apt_repository_key_url }}'
+    state: 'present'
+ # register: 'influxdb__register_apt_key'
+ # until: influxdb__register_apt_key is succeeded
+
+# - name: Install External APT source
+#   apt_repository:
+#     repo: '{{ influxd'
+
+- name: Add InfluxDB APT repository
+  apt_repository:
+    repo: '{{ influxdb__upstream_repository }}'
+    state: 'present'
+    update_cache: True
+    mode: '0644'
+
+- name: Install requested packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+    update_cache: True
+  #  install_recommends: False
+  with_flattened:
+    - '{{ influxdb__base_packages }}'
+    - '{{ influxdb__packages }}'
+ # register: influxdb__register_packages
+ # until: influxdb__register_packages is succeeded
+
+# - name: Ensure InfluxDB is started and runs on startup.
+#   service:
+#     name: influxdb
+#     state: started
+#     enabled: yes
+
+#repo: 'deb {{ influxdb_apt_repository }} {{ influxdb_apt_distribution }} main'
+
+# - name: Create user and database
+#   command: influx && create database "telegraf"
+  #&& create user telegraf with password '123'
+# - name: Create Db
+#   command: influx

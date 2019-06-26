@@ -1,0 +1,19 @@
+---
+grafana_server__allow: [ '0.0.0.0/0' ]
+grafana_apt_repository_key_url: 'https://packages.grafana.com/gpg.key'
+grafana__base_packages: [ 'grafana', 'grafana-server' ]
+grafana__packages: []
+grafana__upstream_repository: 'deb http://packages.grafana.com/oss/deb {{ grafana_release }} main'
+grafana_release: '{{ ansible_local.core.distribution_release
+                    if (ansible_local|d() and ansible_local.core|d() and
+                        ansible_local.core.distribution_release|d())
+                    else ansible_distribution_release }}'
+
+grafana__ferm__dependent_rules:
+
+  - type: 'accept'
+    dport: [ '3000' ]
+    saddr: '{{ grafana_server__allow }}'
+    accept_any: False
+    weight: '40'
+    role: 'grafana'
