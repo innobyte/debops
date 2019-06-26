@@ -1,0 +1,9 @@
+---
+- name: Install requested packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+    install_recommends: True
+  with_flattened:
+    - '{{ telegraf__base_packages }}'
+    - '{{ telegraf__packages }}'

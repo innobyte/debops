@@ -1,0 +1,4 @@
+---
+telegraf_server__allow: [ '0.0.0.0/0' ]
+telegraf__base_packages: [ 'telegraf' ]
+telegraf__packages: []
