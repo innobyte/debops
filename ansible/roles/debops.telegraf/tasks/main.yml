@@ -3,6 +3,7 @@
   package:
     name: '{{ item }}'
     state: 'present'
+    # update_cache: True
     install_recommends: True
   with_flattened:
     - '{{ telegraf__base_packages }}'

@@ -14,14 +14,14 @@
   apt_repository:
     repo: '{{ influxdb__upstream_repository }}'
     state: 'present'
-    update_cache: True
+    #update_cache: True
     mode: '0644'
 
 - name: Install requested packages
   package:
     name: '{{ item }}'
     state: 'present'
-    update_cache: True
+   #update_cache: True
   #  install_recommends: False
   with_flattened:
     - '{{ influxdb__base_packages }}'
