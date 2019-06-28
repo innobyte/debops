@@ -4,4 +4,4 @@
     name: 'influxdb'
     state: 'restarted'
     enabled: yes
-    update_cache: True
+   # update_cache: True

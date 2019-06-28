@@ -3,11 +3,11 @@ influxdb_server__allow: [ '0.0.0.0/0' ]
 influxdb_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
 influxdb__base_packages: [ 'influxdb' ]
 influxdb__packages: [ 'influxdb-client', 'influxdb-dev', 'python-influxdb ' ]
-influxdb__upstream_repository: 'deb https://repos.influxdata.com/ubuntu {{ influxdb_release }} main'
-influxdb_release: '{{ ansible_local.core.distribution_release
-                    if (ansible_local|d() and ansible_local.core|d() and
-                        ansible_local.core.distribution_release|d())
-                    else ansible_distribution_release }}'
+influxdb__upstream_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+# influxdb_release: '{{ ansible_local.core.distribution_release
+#                     if (ansible_local|d() and ansible_local.core|d() and
+#                         ansible_local.core.distribution_release|d())
+#                     else ansible_distribution_release }}'
 influxdb__ferm__dependent_rules:
 
   - type: 'accept'
