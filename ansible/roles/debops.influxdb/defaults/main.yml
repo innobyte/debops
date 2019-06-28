@@ -8,6 +8,12 @@ influxdb__upstream_repository: 'deb https://repos.influxdata.com/ubuntu bionic s
 #                     if (ansible_local|d() and ansible_local.core|d() and
 #                         ansible_local.core.distribution_release|d())
 #                     else ansible_distribution_release }}'
+influxdb_hostname: 'influxdb'
+influxdb_username: 'leo'
+influxdb_password: 'leo'
+influxdb_ip_address: '192.168.3.219'
+influxdb_database_name: 'bechea'
+
 influxdb__ferm__dependent_rules:
 
   - type: 'accept'
@@ -23,3 +29,5 @@ influxdb__ferm__dependent_rules:
     accept_any: False
     weight: '41'
     role: 'influxdb'
+
+python__enabled: True
