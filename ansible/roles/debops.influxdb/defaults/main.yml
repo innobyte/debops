@@ -1,19 +1,46 @@
 ---
-influxdb_server__allow: [ '0.0.0.0/0' ]
-influxdb_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
-influxdb__base_packages: [ 'influxdb' ]
-influxdb__packages: [ 'influxdb-client', 'influxdb-dev', 'python-influxdb ' ]
-influxdb__upstream_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
-# influxdb_release: '{{ ansible_local.core.distribution_release
-#                     if (ansible_local|d() and ansible_local.core|d() and
-#                         ansible_local.core.distribution_release|d())
-#                     else ansible_distribution_release }}'
-influxdb_hostname: 'influxdb'
-influxdb_username: 'leo'
-influxdb_password: 'leo'
-influxdb_ip_address: '192.168.3.219'
-influxdb_database_name: 'bechea'
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
 
+# debops.influxdb default variables [[[
+# ====================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../includes/global.rst
+
+
+# InfluxDB server configuration [[[
+# --------------------------------
+
+# APT packages [[[
+# ----------------
+
+# .. envvar:: influxdb__base_packages [[[
+#
+# List of APT packages which are required by the InfluxDB application.
+influxdb__base_packages: [ 'influxdb' ]
+
+                                                                   # ]]]
+# .. envvar:: influxdb__packages [[[
+#
+# List of APT packages which are required by the InfluxDB application.
+influxdb__packages: [ 'influxdb-client', 'influxdb-dev', 'python-influxdb ' ]
+
+                                                                   # ]]]
+# .. envvar:: influxdb__port [[[
+#
+# Port number on which to connect to the server. You usually don't need to
+# change this.
+#####influxdb__port: '8088' '8086'
+
+                                                                   # ]]]
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: influxdb__ferm__dependent_rules [[[
+#
+# Configuration for :ref:`debops.ferm` Ansible role.
 influxdb__ferm__dependent_rules:
 
   - type: 'accept'
@@ -29,5 +56,42 @@ influxdb__ferm__dependent_rules:
     accept_any: False
     weight: '41'
     role: 'influxdb'
+
+
+                                                                   # ]]]
+# .. envvar:: influxdb_server__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# InfluxDB server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+influxdb_server__allow: [ '0.0.0.0/0' ]
+
+                                                                   # ]]]
+                                                                   # ]]]
+# .. envvar:: influxdb_apt_repository_key_url [[[
+#
+# The key of the upstream InfluxDB APT repository.
+influxdb_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__upstream_apt_repository [[[
+#
+# The APT repository URI of the upstream InfluxDB repository.
+influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+
+                                                                   # ]]]
+
+
+# influxdb_release: '{{ ansible_local.core.distribution_release
+#                     if (ansible_local|d() and ansible_local.core|d() and
+#                         ansible_local.core.distribution_release|d())
+#                     else ansible_distribution_release }}'
+influxdb_hostname: 'influxdb'
+influxdb_username: 'leo'
+influxdb_password: 'leo'
+influxdb_ip_address: '192.168.3.219'
+influxdb_database_name: 'bechea'
+
+
 
 python__enabled: True
