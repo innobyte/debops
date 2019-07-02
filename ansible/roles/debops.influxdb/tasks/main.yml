@@ -12,7 +12,7 @@
 
 - name: Add InfluxDB APT repository
   apt_repository:
-    repo: '{{ influxdb__upstream_repository }}'
+    repo: '{{ influxdb__upstream_apt_repository }}'
     state: 'present'
     #update_cache: True
     mode: '0644'

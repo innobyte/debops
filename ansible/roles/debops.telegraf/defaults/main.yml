@@ -1,4 +1,41 @@
 ---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# debops.influxdb default variables [[[
+# ====================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../includes/global.rst
+
+
+# InfluxDB server configuration [[[
+# --------------------------------
+
+# .. envvar:: telegraf_server__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Telegraf server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
 telegraf_server__allow: [ '0.0.0.0/0' ]
+
+                                                                   # ]]]
+# APT packages [[[
+# ----------------
+
+# .. envvar:: telegraf__base_packages [[[
+#
+# List of APT packages which are required by the Telegraf application.
 telegraf__base_packages: [ 'telegraf' ]
+
+                                                                   # ]]]
+# .. envvar:: telegraf__packages [[[
+#
+# List of APT packages which are required by the Telegraf application.
 telegraf__packages: [ 'apt-transport-https' ]
+
+                                                                   # ]]]
+
+
+external_data_source: [ '127.0.0.1' ]
