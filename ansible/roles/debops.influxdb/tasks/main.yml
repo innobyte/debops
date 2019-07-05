@@ -21,8 +21,9 @@
   package:
     name: '{{ item }}'
     state: 'present'
-   #update_cache: True
-  #  install_recommends: False
+    update_cache: True
+    force: yes
+    install_recommends: False
   with_flattened:
     - '{{ influxdb__base_packages }}'
     - '{{ influxdb__packages }}'
@@ -39,7 +40,7 @@
 
 - name: Create database
   influxdb_database:
-      hostname: "{{ influxdb_ip_address }}"
+      hostname: "{{ influxdb_hostname }}"
       database_name: "{{ influxdb_database_name }}"
  # register: influxdb__register_packages
  # until: influxdb__register_packages is succeeded

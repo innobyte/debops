@@ -25,7 +25,7 @@ influxdb__base_packages: [ 'influxdb' ]
 # .. envvar:: influxdb__packages [[[
 #
 # List of APT packages which are required by the InfluxDB application.
-influxdb__packages: [ 'influxdb-client', 'influxdb-dev', 'python-influxdb ' ]
+influxdb__packages: [ 'influxdb-dev', 'python-influxdb' ]
 
                                                                    # ]]]
 # .. envvar:: influxdb__port [[[
