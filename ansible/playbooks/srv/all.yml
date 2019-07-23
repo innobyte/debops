@@ -89,3 +89,5 @@
 - import_playbook: telegraf.yml
 
 - import_playbook: grafana.yml
+
+- import_playbook: influxdata.yml

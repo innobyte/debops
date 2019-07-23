@@ -28,6 +28,10 @@ influxdb__base_packages: [ 'influxdb' ]
 influxdb__packages: [ 'influxdb-dev', 'python-influxdb' ]
 
                                                                    # ]]]
+influxdb__influxdata__dependent_packages:
+  - '{{ influxdb__base_packages }}'
+  - '{{ influxdb__packages }}'
+
 # .. envvar:: influxdb__port [[[
 #
 # Port number on which to connect to the server. You usually don't need to
@@ -71,25 +75,23 @@ influxdb_server__allow: [ '0.0.0.0/0' ]
 # .. envvar:: influxdb_apt_repository_key_url [[[
 #
 # The key of the upstream InfluxDB APT repository.
-influxdb_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
+# influxdb_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
 
                                                                    # ]]]
 # .. envvar:: influxdb__upstream_apt_repository [[[
 #
 # The APT repository URI of the upstream InfluxDB repository.
-influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+# influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
 
                                                                    # ]]]
-
-
 # influxdb_release: '{{ ansible_local.core.distribution_release
 #                     if (ansible_local|d() and ansible_local.core|d() and
 #                         ansible_local.core.distribution_release|d())
 #                     else ansible_distribution_release }}'
-influxdb_hostname: 'influxdb'
-influxdb_username: 'leo'
-influxdb_password: 'leo'
-influxdb_ip_address: '192.168.3.219'
+influxdb_hostname: 'varnish-1'
+influxdb_username: 'john'
+influxdb_password: 's3cr3t'
+influxdb_ip_address: '192.168.3.218'
 influxdb_database_name: 'bechea'
 
 
