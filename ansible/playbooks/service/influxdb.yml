@@ -13,6 +13,11 @@
     - role: debops.python
       tags: [ 'role::python', 'skip::python' ]
 
+    - role: debops.influxdata
+      tags: [ 'role::influxdata', 'skip::influxdata' ]
+      influxdata__dependent_packages:
+        - '{{ influxdb__influxdata__dependent_packages }}'
+
     - role: debops.influxdb
       tags: [ 'role::influxdb', 'skip::influxdb' ]
 
@@ -20,3 +25,4 @@
       tags: [ 'role::ferm', 'skip::ferm' ]
       ferm__dependent_rules:
         - '{{ influxdb__ferm__dependent_rules }}'
+

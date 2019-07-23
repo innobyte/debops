@@ -10,5 +10,12 @@
 
   roles:
  
+    - role: debops.influxdata
+      tags: [ 'role::influxdata', 'skip::influxdata' ]
+      influxdata__dependent_packages:
+        - '{{ telegraf__influxdata__dependent_packages }}'
+
     - role: debops.telegraf
       tags: [ 'role::telegraf', 'skip::telegraf' ]
+
+    
