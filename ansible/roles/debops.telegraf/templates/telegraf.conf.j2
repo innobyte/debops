@@ -1,30 +1,54 @@
 # Global Agent Configuration
 [agent]
-  hostname = "influxdb"
+  hostname = "{{ ansible_hostname }}"
   flush_interval = "15s"
   interval = "15s"
 
+{% for input in inputs %}
+
+[[inputs.{{ input.name }}]]
+{%   if input.options|d() %}
+{%      for key, value in input.options.items() %}
+      {{ key }} = {{ value }}
+{%      endfor %}
+{%   endif %}
+{% endfor %}
+
+
+
+{% for output in outputs %}
+
+[[outputs.{{ output.name }}]]
+{%   if output.options|d() %}
+{%      for key, value in output.options.items() %}
+      {{ key }} = {{ value }}
+{%      endfor %}
+{%   endif %}
+{% endfor %}
+
+
 
 # Input Plugins
-[[inputs.cpu]]
-    percpu = true
-    totalcpu = true
-    collect_cpu_time = false
-    report_active = false
-[[inputs.disk]]
-    ignore_fs = ["tmpfs", "devtmpfs", "devfs"]
-[[inputs.io]]
-[[inputs.mem]]
-[[inputs.net]]
-[[inputs.system]]
-[[inputs.swap]]
-[[inputs.netstat]]
-[[inputs.processes]]
-[[inputs.kernel]]
+# [[inputs.cpu]]
+#     percpu = true
+#     totalcpu = true
+#     collect_cpu_time = false
+#     report_active = false
+# [[inputs.disk]]
+#     ignore_fs = ["tmpfs", "devtmpfs", "devfs"]
+# [[inputs.io]]
+# [[inputs.mem]]
+# [[inputs.net]]
+# [[inputs.system]]
+# [[inputs.swap]]
+# [[inputs.netstat]]
+# [[inputs.processes]]
+# [[inputs.kernel]]
 
-# Output Plugin InfluxDB
-[[outputs.influxdb]]
-  database = "bechea"
-  urls = [ "http://127.0.0.1:8086" ]
-  username = "john"
-  password = "s3cr3t"
+
+# # Output Plugin InfluxDB
+# [[outputs.influxdb]]
+#   database = "bechea"
+#   urls = [ "http://127.0.0.1:8086" ]
+#   username = "john"
+#   password = "s3cr3t"

@@ -1,0 +1,15 @@
+---
+galaxy_info:
+
+  role_name: 'telegraf'
+  author: 'Reto Gantenbein'
+  description: 'Configure Telegraf service'
+  license: 'GNU General Public License v3'
+  min_ansible_version: '1.7.0'
+  platforms:
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
+  galaxy_tags:
+    - telegraf

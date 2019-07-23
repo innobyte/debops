@@ -36,6 +36,131 @@ telegraf__base_packages: [ 'telegraf' ]
 telegraf__packages: [ 'apt-transport-https' ]
 
                                                                    # ]]]
+telegraf__influxdata__dependent_packages:
+  - '{{ telegraf__base_packages }}'
+  - '{{ telegraf__packages }}'
+
+telegraf__upstream_enabled: '{{ True
+                                if (ansible_distribution_release in
+                                    [ "jessie", "stretch", "trusty", "xenial" ])
+                                else False }}'
+
+telegraf__external_data_source: '192.168.3.218'
+
+inputs:
+  - name: cpu
+    options:
+      'percpu': 'true'
+      'totalcpu': 'true'
+      'collect_cpu_time': 'false'
+      'report_active': 'false'
+
+  - name: disk
+    options:
+      'fielddrop': '[ "inodes" ]'
+      'mount_points': '[ "/" ]'
+      'ignore_fs': '[ "tmpfs", "devtmpfs", "devfs" ]'
+
+  - name: net
+    options:
+      'interfaces': '[ "eth0" ]'
+      'fielddrop': '[ "icmp*", "ip*", "tcp*", "udp*" ]'
+
+  # Get the number of processes and group them by status
+  - name: processes
+    options: []
+
+  - name: netstat
+    options: []
+
+  - name: processes
+    options: []
+
+  # Get kernel statistics from /proc/stat
+  - name: kernel
+    options: []
+
+  # Read metrics about disk IO by device
+  - name: diskio
+    options: []
+
+  # By default, telegraf will gather stats for all devices including
+  # disk partitions.
+  # Setting devices will restrict the stats to the specified devices.
+  #devices = ["sda", "sdb", "vd*"]
+  # Uncomment the following line if you need disk serial numbers.
+  #skip_serial_number = false
+  
+  # On systems which support it, device metadata can be added in the form of
+  # tags.
+  # Currently only Linux is supported via udev properties. You can view
+  # available properties for a device by running:
+  # 'udevadm info -q property -n /dev/sda'
+  # Note: Most, but not all, udev properties can be accessed this way. Properties
+  # that are currently inaccessible include DEVTYPE, DEVNAME, and DEVPATH.
+ # device_tags = ["ID_FS_TYPE", "ID_FS_USAGE"]
+  
+  # Using the same metadata source as device_tags, you can also customize the
+  # name of the device via templates.
+  # The 'name_templates' parameter is a list of templates to try and apply to
+  # the device. The template may contain variables in the form of '$PROPERTY' or
+  # '${PROPERTY}'. The first template which does not contain any variables not
+  # present for the device is used as the device name tag.
+  # The typical use case is for LVM volumes, to get the VG/LV name instead of
+  # the near-meaningless DM-0 name.
+ # name_templates = ["$ID_FS_LABEL","$DM_VG_NAME/$DM_LV_NAME"]
+
+  - name: mem
+    options: []
+
+  - name: swap
+    options: []
+
+  - name: system
+    options: []
+
+outputs: 
+  - name: influxdb
+    options:
+         'database': '"bechea"'
+         'password': '"s3cr3t"'
+         'urls': '[ "http://{{ telegraf__external_data_source }}:8086" ]'
+         'username': '"john"'
 
 
-external_data_source: [ '127.0.0.1' ]
+# .. envvar:: telegraf__inputs [[[
+#
+# Global list of Telegraf inputs.
+telegraf__inputs: []
+
+                                                                   # ]]]
+# .. envvar:: telegraf__group_inputs [[[
+#
+# List of Telegraf inputs in Ansible host group.
+telegraf__group_inputs: []
+
+                                                                   # ]]]
+# .. envvar:: telegraf__host_inputs [[[
+#
+# List of Telegraf inputs on a particular host.
+telegraf__host_inputs: []
+                                                                   # ]]]
+                                                                   # ]]]
+# .. envvar:: telegraf__inputs [[[
+#
+# Global list of Telegraf outputs.
+telegraf__outputs: []
+
+                                                                   # ]]]
+# .. envvar:: telegraf__group_outputs [[[
+#
+# List of Telegraf outputs in Ansible host group.
+telegraf__group_outputs: []
+
+                                                                   # ]]]
+# .. envvar:: telegraf__host_outputs [[[
+#
+# List of Telegraf outputs on a particular host.
+telegraf__host_outputs: []
+                                                                   # ]]]
+                                                                   # ]]]

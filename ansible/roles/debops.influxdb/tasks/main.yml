@@ -1,8 +1,10 @@
 ---
-- name: Add InfluxDB APT key
-  apt_key:
-    url: '{{ influxdb_apt_repository_key_url }}'
-    state: 'present'
+# - name: Add InfluxDB APT key
+#   apt_key:
+#     url: '{{ influxdb_apt_repository_key_url }}'
+#     state: 'present'
+
+
  # register: 'influxdb__register_apt_key'
  # until: influxdb__register_apt_key is succeeded
 
@@ -10,12 +12,12 @@
 #   apt_repository:
 #     repo: '{{ influxd'
 
-- name: Add InfluxDB APT repository
-  apt_repository:
-    repo: '{{ influxdb__upstream_apt_repository }}'
-    state: 'present'
-    #update_cache: True
-    mode: '0644'
+# - name: Add InfluxDB APT repository
+#   apt_repository:
+#     repo: '{{ influxdb__upstream_apt_repository }}'
+#     state: 'present'
+#     update_cache: True
+#     mode: '0644'
 
 - name: Install requested packages
   package:
@@ -29,32 +31,24 @@
     - '{{ influxdb__packages }}'
 
 
-- name: Create an admin user on a remote host using custom login credentials
-  influxdb_user:
-    user_name: john
-    user_password: s3cr3t
-    admin: yes
-    hostname: "{{ influxdb_hostname }}"
-    login_username: "{{ influxdb_username }}"
-    login_password: "{{ influxdb_password }}"
+# - name: Create an admin user on a remote host using custom login credentials
+#   influxdb_user:
+#     user_name: john
+#     user_password: s3cr3t
+#     admin: yes
+#     hostname: "{{ influxdb_hostname }}"
+#     login_username: "{{ influxdb_username }}"
+#     login_password: "{{ influxdb_password }}"
 
 - name: Create database
   influxdb_database:
-      hostname: "{{ influxdb_hostname }}"
+      hostname: "{{ influxdb_ip_address }}"
+      username: "{{ influxdb_username }}"
+      password: "{{ influxdb_password }}"
       database_name: "{{ influxdb_database_name }}"
- # register: influxdb__register_packages
- # until: influxdb__register_packages is succeeded
 
 # - name: Ensure InfluxDB is started and runs on startup.
 #   service:
 #     name: influxdb
 #     state: started
 #     enabled: yes
-
-#repo: 'deb {{ influxdb_apt_repository }} {{ influxdb_apt_distribution }} main'
-
-# - name: Create user and database
-#   command: influx && create database "telegraf"
-  #&& create user telegraf with password '123'
-# - name: Create Db
-#   command: influx
