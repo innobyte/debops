@@ -1,0 +1,9 @@
+---
+
+influxdata_apt_repository_key_url: 'https://repos.influxdata.com/influxdb.key'
+influxdata__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+influxdata__base_packages: []
+influxdata__packages: []
+influxdata__host_packages: []
+influxdata__group_packages: []
+influxdata__dependent_packages: []
