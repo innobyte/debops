@@ -4,7 +4,7 @@
   flush_interval = "15s"
   interval = "15s"
 
-{% for input in inputs %}
+{% for input in telegraf__default_inputs %}
 
 [[inputs.{{ input.name }}]]
 {%   if input.options|d() %}
@@ -16,7 +16,7 @@
 
 
 
-{% for output in outputs %}
+{% for output in telegraf__default_outputs %}
 
 [[outputs.{{ output.name }}]]
 {%   if output.options|d() %}

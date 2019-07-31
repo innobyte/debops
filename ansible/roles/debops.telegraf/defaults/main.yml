@@ -13,6 +13,7 @@
 # InfluxDB server configuration [[[
 # --------------------------------
 
+telegraf__influxdata_dependent_upstream_enabled: True
 # .. envvar:: telegraf_server__allow [[[
 #
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
@@ -36,18 +37,14 @@ telegraf__base_packages: [ 'telegraf' ]
 telegraf__packages: [ 'apt-transport-https' ]
 
                                                                    # ]]]
+
 telegraf__influxdata__dependent_packages:
   - '{{ telegraf__base_packages }}'
   - '{{ telegraf__packages }}'
 
-telegraf__upstream_enabled: '{{ True
-                                if (ansible_distribution_release in
-                                    [ "jessie", "stretch", "trusty", "xenial" ])
-                                else False }}'
-
 telegraf__external_data_source: '192.168.3.218'
 
-inputs:
+telegraf__default_inputs:
   - name: cpu
     options:
       'percpu': 'true'
@@ -119,7 +116,7 @@ inputs:
   - name: system
     options: []
 
-outputs: 
+telegraf__default_outputs: 
   - name: influxdb
     options:
          'database': '"bechea"'

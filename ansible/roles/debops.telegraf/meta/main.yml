@@ -2,7 +2,7 @@
 galaxy_info:
 
   role_name: 'telegraf'
-  author: 'Reto Gantenbein'
+  author: 'Bechea Leonardo'
   description: 'Configure Telegraf service'
   license: 'GNU General Public License v3'
   min_ansible_version: '1.7.0'
