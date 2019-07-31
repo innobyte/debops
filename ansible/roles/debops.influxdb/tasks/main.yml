@@ -1,35 +1,15 @@
 ---
-# - name: Add InfluxDB APT key
-#   apt_key:
-#     url: '{{ influxdb_apt_repository_key_url }}'
-#     state: 'present'
 
-
- # register: 'influxdb__register_apt_key'
- # until: influxdb__register_apt_key is succeeded
-
-# - name: Install External APT source
-#   apt_repository:
-#     repo: '{{ influxd'
-
-# - name: Add InfluxDB APT repository
-#   apt_repository:
-#     repo: '{{ influxdb__upstream_apt_repository }}'
+# - name: Install requested packages
+#   package:
+#     name: '{{ item }}'
 #     state: 'present'
 #     update_cache: True
-#     mode: '0644'
-
-- name: Install requested packages
-  package:
-    name: '{{ item }}'
-    state: 'present'
-    update_cache: True
-    force: yes
-    install_recommends: False
-  with_flattened:
-    - '{{ influxdb__base_packages }}'
-    - '{{ influxdb__packages }}'
-
+#     force: yes
+#     install_recommends: False
+#   with_flattened:
+#     - '{{ influxdb__base_packages }}'
+#     - '{{ influxdb__packages }}'
 
 # - name: Create an admin user on a remote host using custom login credentials
 #   influxdb_user:
@@ -46,9 +26,3 @@
       username: "{{ influxdb_username }}"
       password: "{{ influxdb_password }}"
       database_name: "{{ influxdb_database_name }}"
-
-# - name: Ensure InfluxDB is started and runs on startup.
-#   service:
-#     name: influxdb
-#     state: started
-#     enabled: yes
