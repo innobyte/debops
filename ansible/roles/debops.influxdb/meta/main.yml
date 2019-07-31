@@ -5,7 +5,7 @@ dependencies: []
 galaxy_info:
 
   role_name: 'influxdb'
-  author: 'Maciej Delmanowski'
+  author: 'Bechea Leonardo'
   description: 'Configure InfluxDB APT repositories'
   company: 'DebOps'
   license: 'GPL-3.0-only'

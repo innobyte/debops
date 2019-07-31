@@ -24,7 +24,7 @@ grafana__base_packages: [ 'grafana' ]
                                                                    # ]]]
 # .. envvar:: grafana__packages [[[
 #
-# List of APT packages which are required by the Grafana application.
+# List of APT packages to install on all hosts in Ansible inventory.
 grafana__packages: [ 'software-properties-common', 'apt-transport-https' ]
 
                                                                    # ]]]
@@ -33,7 +33,7 @@ grafana__packages: [ 'software-properties-common', 'apt-transport-https' ]
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
 # Grafana server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
 # connections are not allowed.
-grafana_server__allow: [ '0.0.0.0/0' ]
+grafana_allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
                                                                    # ]]]
@@ -49,6 +49,12 @@ grafana_apt_repository_key_url: 'https://packages.grafana.com/gpg.key'
 grafana__upstream_apt_repository: 'deb https://packages.grafana.com/oss/deb stable main'
 
                                                                    # ]]]
+# .. envvar:: grafana__port [[[
+#
+# Port number on which this Grafana server listens on.
+grafana__port: '3000'
+
+                                                                   # ]]]
 # Configuration for other Ansible roles [[[
 # -----------------------------------------
 
@@ -58,17 +64,23 @@ grafana__upstream_apt_repository: 'deb https://packages.grafana.com/oss/deb stab
 grafana__ferm__dependent_rules:
 
   - type: 'accept'
-    dport: [ '3000' ]
-    saddr: '{{ grafana_server__allow }}'
+    dport: [ 'grafana' ]
+    saddr: '{{ grafana_allow }}'
     accept_any: False
     weight: '40'
     role: 'grafana'
 
 
                                                                    # ]]]
+# .. envvar:: grafana__etc_services__dependent_list [[[
+#
+# Configuration for the :ref:`debops.etc_services` Ansible role.
+grafana__etc_services__dependent_list:
 
+  - name: 'grafana'
+    port: '{{ grafana__port }}'
 
-
+                                                                   # ]]]
 
 
 grafana_release: '{{ ansible_local.core.distribution_release

@@ -12,6 +12,10 @@
 
     - role: debops.python
       tags: [ 'role::python', 'skip::python' ]
+      python__dependent_packages2:
+        - '{{ influxdb__python__dependent_packages2 }}'
+      python__dependent_packages3:
+        - '{{ influxdb__python__dependent_packages3 }}'
 
     - role: debops.influxdata
       tags: [ 'role::influxdata', 'skip::influxdata' ]

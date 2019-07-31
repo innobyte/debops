@@ -6,11 +6,13 @@
     state: 'started'
     enabled: True
 
-- name: restart grafana
+- name: Restart grafana
   service:
     name: 'grafana'
     state: 'restarted'
     enabled: yes
 
-- name: update upgrade
-  command: apt-get update && apt-get upgrade
+- name: Reload grafana
+  service:
+    name: 'grafana'
+    state: 'reloaded'
