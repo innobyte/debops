@@ -2,15 +2,17 @@
 
 - name: Add Influxdata APT key
   apt_key:
-    url: '{{ influxdata_apt_repository_key_url }}'
+    url: '{{ influxdata__upstream_key }}'
     state: 'present'
+  when: "{{ influxdata__upstream_enabled }}"
 
 - name: Add Influxdata APT repository
   apt_repository:
-    repo: '{{ influxdata__upstream_apt_repository }}'
+    repo: '{{ influxdata__upstream_repo }}'
     state: 'present'
     update_cache: True
     mode: '0644'
+  when: "{{ influxdata__upstream_enabled }}"
 
 - name: Install Influxdata requested packages
   package:
@@ -18,7 +20,6 @@
     state: 'present'
     update_cache: True
     force: yes
-    install_recommends: False
   with_flattened:
     - '{{ influxdata__base_packages }}'
     - '{{ influxdata__packages }}'
