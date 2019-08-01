@@ -22,11 +22,6 @@
       python__dependent_packages3:
         - '{{ influxdb__python__dependent_packages3 }}'
 
-    - role: debops.influxdata
-      tags: [ 'role::influxdata', 'skip::influxdata' ]
-      influxdata__dependent_packages:
-        - '{{ influxdb__influxdata__dependent_packages }}'
-
     - role: debops.influxdb
       tags: [ 'role::influxdb', 'skip::influxdb' ]
 
