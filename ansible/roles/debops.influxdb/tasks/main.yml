@@ -1,15 +1,34 @@
 ---
 
-# - name: Install requested packages
-#   package:
-#     name: '{{ item }}'
-#     state: 'present'
-#     update_cache: True
-#     force: yes
-#     install_recommends: False
-#   with_flattened:
-#     - '{{ influxdb__base_packages }}'
-#     - '{{ influxdb__packages }}'
+- name: Add Influxdb APT key
+  apt_key:
+    url: '{{ influxdb__upstream_apt_key }}'
+    state: 'present'
+  when: "{{ influxdb__upstream_enabled }}"
+
+- name: Add Influxdb APT repository
+  apt_repository:
+    repo: '{{ influxdb__upstream_apt_repository }}'
+    state: 'present'
+    update_cache: True
+    mode: '0644'
+  when: "{{ influxdb__upstream_enabled }}"
+
+- name: Install Influxdb requested packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+    update_cache: True
+    force: yes
+  with_flattened:
+    - '{{ influxdb__base_packages }}'
+    - '{{ influxdb__packages }}'
+    - '{{ influxdb__host_packages }}'
+    - '{{ influxdb__group_packages }}'
+    - '{{ influxdb__dependent_packages }}'
+  register: influxdb__register_install
+  until: influxdb__register_install is succeeded
+  when: "{{ influxdata__dependent_upstream_enabled }}"
 
 # - name: Create an admin user on a remote host using custom login credentials
 #   influxdb_user:

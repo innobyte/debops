@@ -30,16 +30,3 @@
 - name: Update Ansible facts if they were modified
   action: setup
   when: telegraf__register_facts is changed
-
-# - name: Rename the original file telegraf.conf to telegraf.conf.default
-#   command: mv /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.default
-
-# - name: Create a new file inside /etc/telegraf named telegraf.conf
-#   command: touch /etc/telegraf/telegraf.conf
-
-# - name: Apply the template telegraf.conf.j2 to /etc/telegraf/
-#   template: src=telegraf.conf.j2 dest=/etc/telegraf/telegraf.conf
-
-# - name: Generate conf using telegraf command
-#   command: telegraf config -input-filter cpu:mem:disk:swap:system -output-filter influxdb > telegraf.conf
-

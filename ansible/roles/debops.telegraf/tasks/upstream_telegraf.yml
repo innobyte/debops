@@ -1,0 +1,7 @@
+---
+
+- name: Ensure that the /root/.gnupg directory exists
+  file:
+    path: '~/.gnupg'
+    state: 'directory'
+    mode: '0700'
