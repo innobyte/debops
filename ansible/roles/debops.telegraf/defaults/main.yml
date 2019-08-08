@@ -10,16 +10,39 @@
 # .. include:: ../../../includes/global.rst
 
 
-# InfluxDB server configuration [[[
+# Telegraf server configuration [[[
 # --------------------------------
 
-telegraf__influxdata_dependent_upstream_enabled: True
-# .. envvar:: telegraf_server__allow [[[
+
+# .. envvar:: telegraf__upstream_apt_key [[[
 #
-# List of IP addresses or CIDR subnets which will be allowed to connect to the
-# Telegraf server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
-# connections are not allowed.
-telegraf_server__allow: [ '0.0.0.0/0' ]
+# The OpenPGP key of the Telegraf upstream APT repository.
+telegraf__upstream_apt_key: 'https://repos.influxdata.com/influxdb.key'
+
+                                                                   # ]]]
+# .. envvar:: telegraf__upstream_apt_repository [[[
+#
+# The URL of the Telegraf upstream :command:`git` repository.
+telegraf__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+
+                                                                   # ]]]
+# Installation, APT packages [[[
+# ------------------------------
+
+# .. envvar:: telegraf__deploy_type [[[
+#
+# Select how Telegraf should be installed by the role:
+#
+# - ``system``: install Telegraf using current OS packages, possibly from the
+#               backports repository.
+#
+# - ``upstream``: install Telegraf from the upstream APT repository on
+#                 Launchpad (PPA, usable on Debian as well).
+#
+# - ``bootstrap``: install APT packages required for Telegraf and build a local
+#                  ``.deb`` package using the upstream GitHub repository.
+#
+telegraf__deploy_type: "upstream"
 
                                                                    # ]]]
 # APT packages [[[
@@ -37,127 +60,126 @@ telegraf__base_packages: [ 'telegraf' ]
 telegraf__packages: [ 'apt-transport-https' ]
 
                                                                    # ]]]
+# Upstream telegraf installation [[[
+# ------------------------------
 
-telegraf__influxdata__dependent_packages:
-  - '{{ telegraf__base_packages }}'
-  - '{{ telegraf__packages }}'
+# .. envvar:: telegraf__upstream_enabled [[[
+#
+# Enable or disable installation of the :command:`yadm` script from upstream
+# :command:`git` repository.
+telegraf__dependent_upstream_enabled: False
 
-telegraf__external_data_source: '192.168.3.218'
+                                                                   # ]]]
+# .. envvar:: telegraf__keyring__dependent_apt_keys [[[
+#
+# Configuration for the :ref:`debops.keyring` Ansible role.
+telegraf__keyring__dependent_apt_keys:
 
-telegraf__default_inputs:
-  - name: cpu
+  - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
+    # url: '{{ telegraf__upstream_apt_key }}'
+    repo: '{{ telegraf__upstream_apt_repository }}'
+    state: '{{ "present" if (telegraf__deploy_type == "upstream") else "absent" }}'
+                                                                   # ]]]
+                                                                   # ]]]
+# .. envvar:: telegraf_server__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Telegraf server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+telegraf_server__allow: [ '0.0.0.0/0' ]
+
+                                                                   # ]]]
+# Telegraf configuration file [[[
+# ------------------------------------
+
+# The variables below define the contents of the
+# :file:`/etc/telegraf/telegraf.conf` configuration file.
+# See :ref:`telegraf__ref_configuration` for the details and configuration
+# syntax.
+
+# .. envvar:: telegraf__default_configuration [[[
+#
+# The default configuration options which should be present in the main
+# configuration file.
+telegraf__default_configuration:
+
+  - name: global_tags
     options:
-      'percpu': 'true'
-      'totalcpu': 'true'
-      'collect_cpu_time': 'false'
-      'report_active': 'false'
+      - dc: '"us-east-1"'
+        rack: '"1a"'
+        user: '"$USER"'
 
-  - name: disk
+  - name: 'agent'
     options:
-      'fielddrop': '[ "inodes" ]'
-      'mount_points': '[ "/" ]'
-      'ignore_fs': '[ "tmpfs", "devtmpfs", "devfs" ]'
+      - hostname: '"$hostname"'
+      - flush_interval: '"15s"'
+      - interval: '"15s"'
 
-  - name: net
+  - name: inputs.cpu
     options:
-      'interfaces': '[ "eth0" ]'
-      'fielddrop': '[ "icmp*", "ip*", "tcp*", "udp*" ]'
+      - percpu: 'true'
+        totalcpu: 'true'
+        collect_cpu_time: 'false'
+        report_active: 'false'
+
+  - name: inputs.disk
+    options:
+      - fielddrop: '[ "inodes" ]'
+      - mount_points: '[ "/" ]'
+      - ignore_fs: '[ "tmpfs", "devtmpfs", "devfs" ]'
+
+  - name: inputs.net
+    options:
+      - interfaces: '[ "eth0" ]'
+      - fielddrop: '[ "icmp*", "ip*", "tcp*", "udp*" ]'
 
   # Get the number of processes and group them by status
-  - name: processes
+  - name: inputs.processes
     options: []
 
-  - name: netstat
+  - name: inputs.netstat
     options: []
 
-  - name: processes
+  - name: inputs.processes
     options: []
 
   # Get kernel statistics from /proc/stat
-  - name: kernel
+  - name: inputs.kernel
     options: []
 
   # Read metrics about disk IO by device
-  - name: diskio
+  - name: inputs.diskio
     options: []
 
-  # By default, telegraf will gather stats for all devices including
-  # disk partitions.
-  # Setting devices will restrict the stats to the specified devices.
-  #devices = ["sda", "sdb", "vd*"]
-  # Uncomment the following line if you need disk serial numbers.
-  #skip_serial_number = false
-  
-  # On systems which support it, device metadata can be added in the form of
-  # tags.
-  # Currently only Linux is supported via udev properties. You can view
-  # available properties for a device by running:
-  # 'udevadm info -q property -n /dev/sda'
-  # Note: Most, but not all, udev properties can be accessed this way. Properties
-  # that are currently inaccessible include DEVTYPE, DEVNAME, and DEVPATH.
- # device_tags = ["ID_FS_TYPE", "ID_FS_USAGE"]
-  
-  # Using the same metadata source as device_tags, you can also customize the
-  # name of the device via templates.
-  # The 'name_templates' parameter is a list of templates to try and apply to
-  # the device. The template may contain variables in the form of '$PROPERTY' or
-  # '${PROPERTY}'. The first template which does not contain any variables not
-  # present for the device is used as the device name tag.
-  # The typical use case is for LVM volumes, to get the VG/LV name instead of
-  # the near-meaningless DM-0 name.
- # name_templates = ["$ID_FS_LABEL","$DM_VG_NAME/$DM_LV_NAME"]
-
-  - name: mem
+  - name: inputs.mem
     options: []
 
-  - name: swap
+  - name: inputs.swap
     options: []
 
-  - name: system
+  - name: inputs.system
     options: []
 
-telegraf__default_outputs: 
-  - name: influxdb
+
+  - name: outputs.influxdb
     options:
-         'database': '"bechea"'
-         'password': '"s3cr3t"'
-         'urls': '[ "http://{{ telegraf__external_data_source }}:8086" ]'
-         'username': '"john"'
-
-
-# .. envvar:: telegraf__inputs [[[
-#
-# Global list of Telegraf inputs.
-telegraf__inputs: []
+       - database: '"bechea"'
+       - password: '"s3cr3t"'
+       - urls: '[ "http://192.168.3.242:8086" ]'
+       - username: '"john"'
 
                                                                    # ]]]
-# .. envvar:: telegraf__group_inputs [[[
+# .. envvar:: telegraf__configuration [[[
 #
-# List of Telegraf inputs in Ansible host group.
-telegraf__group_inputs: []
+# List of configuration options defined on all hosts in the Ansible inventory.
+telegraf__configuration: []
 
                                                                    # ]]]
-# .. envvar:: telegraf__host_inputs [[[
+# .. envvar:: telegraf__combined_configuration [[[
 #
-# List of Telegraf inputs on a particular host.
-telegraf__host_inputs: []
-                                                                   # ]]]
-                                                                   # ]]]
-# .. envvar:: telegraf__inputs [[[
-#
-# Global list of Telegraf outputs.
-telegraf__outputs: []
+# Actual list of Telegraf configuration options passed to the
+# configuration template. This list defines the order in which the options from
+# different variables are processed.
+telegraf__combined_configuration: '{{ telegraf__default_configuration + telegraf__configuration }}'
 
-                                                                   # ]]]
-# .. envvar:: telegraf__group_outputs [[[
-#
-# List of Telegraf outputs in Ansible host group.
-telegraf__group_outputs: []
-
-                                                                   # ]]]
-# .. envvar:: telegraf__host_outputs [[[
-#
-# List of Telegraf outputs on a particular host.
-telegraf__host_outputs: []
-                                                                   # ]]]
                                                                    # ]]]

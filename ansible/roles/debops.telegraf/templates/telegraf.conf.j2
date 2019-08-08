@@ -1,32 +1,22 @@
 # Global Agent Configuration
-[agent]
-  hostname = "{{ ansible_hostname }}"
-  flush_interval = "15s"
-  interval = "15s"
 
-{% for input in telegraf__default_inputs %}
+{% for element in telegraf__combined_config | parse_kv_items %}
+{%   if element.name|d() and element.state|d('present') not in [ 'absent', 'ignore' ] %}
 
-[[inputs.{{ input.name }}]]
-{%   if input.options|d() %}
-{%      for key, value in input.options.items() %}
-      {{ key }} = {{ value }}
-{%      endfor %}
+{%     if '.' in element.name %}
+{{ '[[{}]]'.format(element.name) }}
+{%     else %}
+{{ '[{}]'.format(element.name) }}
+{%     endif %}
+{%     if element.options|d() %}
+{%       for thing in element.options %}
+{%          if thing.name|d() and thing.value|d() and thing.state|d('present') != 'absent' %}
+{{ '   {} = {}'.format(thing.name, thing.value) }}
+{%         endif %}
+{%       endfor %}
+{%     endif %}
 {%   endif %}
 {% endfor %}
-
-
-
-{% for output in telegraf__default_outputs %}
-
-[[outputs.{{ output.name }}]]
-{%   if output.options|d() %}
-{%      for key, value in output.options.items() %}
-      {{ key }} = {{ value }}
-{%      endfor %}
-{%   endif %}
-{% endfor %}
-
-
 
 # Input Plugins
 # [[inputs.cpu]]

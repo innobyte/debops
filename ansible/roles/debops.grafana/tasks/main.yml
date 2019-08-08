@@ -8,7 +8,6 @@
   apt_repository:
     repo: '{{ grafana__upstream_apt_repository }}'
     state: 'present'
-    #update_cache: True
     mode: '0644'
 
 - name: Install requested packages
@@ -18,3 +17,4 @@
   with_flattened:
     - '{{ grafana__base_packages }}'
     - '{{ grafana__packages }}'
+  notify: [ 'Reload grafana' ]

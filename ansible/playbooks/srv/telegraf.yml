@@ -10,10 +10,10 @@
 
   roles:
  
-    - role: debops.influxdata
-      tags: [ 'role::influxdata', 'skip::influxdata' ]
-      influxdata__dependent_packages:
-        - '{{ telegraf__influxdata__dependent_packages }}'
+    - role: debops.keyring
+      tags: [ 'role::keyring', 'skip::keyring', 'role::telegraf' ]
+      keyring__dependent_apt_keys:
+        - '{{ telegraf__keyring__dependent_apt_keys }}'
 
     - role: debops.telegraf
       tags: [ 'role::telegraf', 'skip::telegraf' ]
