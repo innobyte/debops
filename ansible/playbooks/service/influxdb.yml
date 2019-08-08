@@ -10,6 +10,11 @@
 
   roles:
 
+    - role: debops.keyring
+      tags: [ 'role::keyring', 'skip::keyring', 'role::influxdb' ]
+      keyring__dependent_apt_keys:
+        - '{{ influxdb__keyring__dependent_apt_keys }}'
+
     - role: debops.python
       tags: [ 'role::python', 'skip::python' ]
       python__dependent_packages2:

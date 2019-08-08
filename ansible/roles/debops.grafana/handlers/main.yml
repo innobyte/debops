@@ -1,16 +1,10 @@
 ---
 
-- name: Start grafana
-  service:
-    name: 'grafana'
-    state: 'started'
-    enabled: True
-
 - name: Restart grafana
   service:
     name: 'grafana'
     state: 'restarted'
-    enabled: yes
+    enabled: True
 
 - name: Reload grafana
   service:

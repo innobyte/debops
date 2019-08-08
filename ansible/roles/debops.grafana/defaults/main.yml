@@ -13,6 +13,18 @@
 # Grafana server configuration [[[
 # --------------------------------
 
+# .. envvar:: grafana_apt_repository_key_url [[[
+#
+# The GPG key of the upstream Grafana APT repository.
+grafana_apt_repository_key_url: 'https://packages.grafana.com/gpg.key'
+
+                                                                   # ]]]
+# .. envvar:: grafana__upstream_apt_repository [[[
+#
+# The APT repository URI of the upstream Grafana repository.
+grafana__upstream_apt_repository: 'deb https://packages.grafana.com/oss/deb stable main'
+
+                                                                   # ]]]
 # APT packages [[[
 # ----------------
 
@@ -36,19 +48,6 @@ grafana__packages: [ 'software-properties-common', 'apt-transport-https' ]
 grafana_allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
-                                                                   # ]]]
-# .. envvar:: grafana_apt_repository_key_url [[[
-#
-# The GPG key of the upstream Grafana APT repository.
-grafana_apt_repository_key_url: 'https://packages.grafana.com/gpg.key'
-
-                                                                   # ]]]
-# .. envvar:: grafanab__upstream_apt_repository [[[
-#
-# The APT repository URI of the upstream Grafana repository.
-grafana__upstream_apt_repository: 'deb https://packages.grafana.com/oss/deb stable main'
-
-                                                                   # ]]]
 # .. envvar:: grafana__port [[[
 #
 # Port number on which this Grafana server listens on.
@@ -70,7 +69,6 @@ grafana__ferm__dependent_rules:
     weight: '40'
     role: 'grafana'
 
-
                                                                    # ]]]
 # .. envvar:: grafana__etc_services__dependent_list [[[
 #
@@ -81,11 +79,3 @@ grafana__etc_services__dependent_list:
     port: '{{ grafana__port }}'
 
                                                                    # ]]]
-
-
-grafana_release: '{{ ansible_local.core.distribution_release
-                    if (ansible_local|d() and ansible_local.core|d() and
-                        ansible_local.core.distribution_release|d())
-                    else ansible_distribution_release }}'
-
-
