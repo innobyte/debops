@@ -4,7 +4,7 @@
   service:
     name: 'telegraf'
     state: 'restarted'
-    enabled: yes
+    enabled: True
 
 - name: Reload telegraf
   service:

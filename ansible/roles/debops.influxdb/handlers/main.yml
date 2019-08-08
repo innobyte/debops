@@ -3,8 +3,7 @@
   service:
     name: 'influxdb'
     state: 'restarted'
-    enabled: yes
-   # update_cache: True
+    enabled: True
 
 - name: Reload influxdb
   service:

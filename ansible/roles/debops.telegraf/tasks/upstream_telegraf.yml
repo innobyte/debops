@@ -1,7 +1,14 @@
 ---
 
-- name: Ensure that the /root/.gnupg directory exists
+- name: Clone the telegraf upstream repository
+  git:
+    repo: '{{ telegraf__upstream_repo }}'
+    dest: '{{ telegraf__upstream_dest }}'
+    version: '{{ telegraf__upstream_version }}'
+    verify_commit: True
+
+- name: Symlink the upstream yadm binary in $PATH
   file:
-    path: '~/.gnupg'
-    state: 'directory'
-    mode: '0700'
+    dest: '{{ yadm__upstream_link }}'
+    src: '{{ yadm__upstream_dest + "/yadm" }}'
+    state: 'link'

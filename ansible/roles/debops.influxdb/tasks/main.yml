@@ -1,25 +1,23 @@
 ---
 
-- name: Add Influxdb APT key
-  apt_key:
-    url: '{{ influxdb__upstream_apt_key }}'
-    state: 'present'
-  when: "{{ influxdb__upstream_enabled }}"
+# - name: Add Influxdb APT key
+#   apt_key:
+#     url: '{{ influxdb__upstream_apt_key }}'
+#     state: 'present'
+#   when: "{{ influxdb__deploy_type }}"
 
-- name: Add Influxdb APT repository
-  apt_repository:
-    repo: '{{ influxdb__upstream_apt_repository }}'
-    state: 'present'
-    update_cache: True
-    mode: '0644'
-  when: "{{ influxdb__upstream_enabled }}"
+# - name: Add Influxdb APT repository
+#   apt_repository:
+#     repo: '{{ influxdb__upstream_apt_repository }}'
+#     state: 'present'
+#     update_cache: True
+#     mode: '0644'
+#   when: "{{ influxdb__deploy_type }}"
 
 - name: Install Influxdb requested packages
   package:
     name: '{{ item }}'
     state: 'present'
-    update_cache: True
-    force: yes
   with_flattened:
     - '{{ influxdb__base_packages }}'
     - '{{ influxdb__packages }}'
@@ -28,20 +26,20 @@
     - '{{ influxdb__dependent_packages }}'
   register: influxdb__register_install
   until: influxdb__register_install is succeeded
-  when: "{{ influxdata__dependent_upstream_enabled }}"
+  notify: [ 'Reload influxdb' ]
 
-# - name: Create an admin user on a remote host using custom login credentials
-#   influxdb_user:
-#     user_name: john
-#     user_password: s3cr3t
-#     admin: yes
-#     hostname: "{{ influxdb_hostname }}"
-#     login_username: "{{ influxdb_username }}"
-#     login_password: "{{ influxdb_password }}"
+- name: Create an admin user on a remote host using custom login credentials
+  influxdb_user:
+    user_name: john
+    user_password: s3cr3t
+    admin: yes
+    hostname: "{{ influxdb_hostname }}"
+    # login_username: "{{ influxdb_username }}"
+    # login_password: "{{ influxdb_password }}"
 
 - name: Create database
   influxdb_database:
       hostname: "{{ influxdb_ip_address }}"
-      username: "{{ influxdb_username }}"
-      password: "{{ influxdb_password }}"
+      username: "{{ influxdb_database_username }}"
+      # password: "{{ influxdb_password }}"
       database_name: "{{ influxdb_database_name }}"
