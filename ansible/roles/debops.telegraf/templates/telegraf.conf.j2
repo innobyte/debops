@@ -1,6 +1,6 @@
 # Global Agent Configuration
 
-{% for element in telegraf__combined_config | parse_kv_items %}
+{% for element in telegraf__combined_configuration | parse_kv_items %}
 {%   if element.name|d() and element.state|d('present') not in [ 'absent', 'ignore' ] %}
 
 {%     if '.' in element.name %}

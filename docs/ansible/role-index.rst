@@ -33,6 +33,7 @@ etc.
 - :ref:`debops.prosody`
 - :ref:`debops.rstudio_server`
 - :ref:`debops.phpipam`
+- :ref:`debops.grafana`
 - ``debops.phpmyadmin``
 - ``debops-contrib.foodsoft``
 - ``debops-contrib.homeassistant``
@@ -110,6 +111,7 @@ Databases
 - :ref:`debops.redis_server`
 - :ref:`debops.redis_sentinel`
 - :ref:`debops.slapd`
+- :ref:`debops.influxdb`
 - ``debops.phpmyadmin``
 
 
@@ -177,7 +179,7 @@ Logging
 - :ref:`debops.kibana`
 - :ref:`debops.logrotate`
 - :ref:`debops.rsyslog`
-
+- :ref:`debops.telegraf`
 
 Mail services
 -------------
