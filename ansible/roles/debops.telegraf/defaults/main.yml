@@ -81,12 +81,12 @@ telegraf__keyring__dependent_apt_keys:
     state: '{{ "present" if (telegraf__deploy_type == "upstream") else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]
-# .. envvar:: telegraf_server__allow [[[
+# .. envvar:: telegraf__allow [[[
 #
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
 # Telegraf server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
 # connections are not allowed.
-telegraf_server__allow: [ '0.0.0.0/0' ]
+telegraf__allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
 # Telegraf configuration file [[[
