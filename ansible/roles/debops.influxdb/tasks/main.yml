@@ -1,19 +1,5 @@
 ---
 
-# - name: Add Influxdb APT key
-#   apt_key:
-#     url: '{{ influxdb__upstream_apt_key }}'
-#     state: 'present'
-#   when: "{{ influxdb__deploy_type }}"
-
-# - name: Add Influxdb APT repository
-#   apt_repository:
-#     repo: '{{ influxdb__upstream_apt_repository }}'
-#     state: 'present'
-#     update_cache: True
-#     mode: '0644'
-#   when: "{{ influxdb__deploy_type }}"
-
 - name: Install Influxdb requested packages
   package:
     name: '{{ item }}'
@@ -39,7 +25,7 @@
 
 - name: Create database
   influxdb_database:
-      hostname: "{{ influxdb_ip_address }}"
-      username: "{{ influxdb_database_username }}"
-      # password: "{{ influxdb_password }}"
-      database_name: "{{ influxdb_database_name }}"
+    hostname: "{{ influxdb_ip_address }}"
+    username: "{{ influxdb_database_username }}"
+    # password: "{{ influxdb_password }}"
+    database_name: "{{ influxdb_database_name }}"

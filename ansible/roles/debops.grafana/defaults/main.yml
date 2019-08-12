@@ -45,7 +45,7 @@ grafana__packages: [ 'software-properties-common', 'apt-transport-https' ]
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
 # Grafana server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
 # connections are not allowed.
-grafana_allow: [ '0.0.0.0/0' ]
+grafana__allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
 # .. envvar:: grafana__port [[[
@@ -64,7 +64,7 @@ grafana__ferm__dependent_rules:
 
   - type: 'accept'
     dport: [ 'grafana' ]
-    saddr: '{{ grafana_allow }}'
+    saddr: '{{ grafana__allow }}'
     accept_any: False
     weight: '40'
     role: 'grafana'

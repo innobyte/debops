@@ -17,4 +17,4 @@
   with_flattened:
     - '{{ grafana__base_packages }}'
     - '{{ grafana__packages }}'
-  notify: [ 'Reload grafana' ]
+  notify: [ 'Restart grafana' ]

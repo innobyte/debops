@@ -92,32 +92,32 @@ influxdb__ferm__dependent_rules:
 
   - type: 'accept'
     dport: [ '8086' ]
-    saddr: '{{ influxdb_server__allow }}'
+    saddr: '{{ influxdb__allow }}'
     accept_any: False
     weight: '40'
     role: 'influxdb'
 
   - type: 'accept'
     dport: [ '8088' ]
-    saddr: '{{ influxdb_server__allow }}'
+    saddr: '{{ influxdb__allow }}'
     accept_any: False
     weight: '41'
     role: 'influxdb'
 
 
                                                                    # ]]]
-# .. envvar:: influxdb_server__allow [[[
+# .. envvar:: influxdb__allow [[[
 #
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
 # InfluxDB server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
 # connections are not allowed.
-influxdb_server__allow: [ '0.0.0.0/0' ]
+influxdb__allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
 # .. envvar:: influxdb__hostname [[[
 #
 # Hostname added to the IQN to create Initiator Name.
-influxdb_hostname: 'zabix'
+influxdb_hostname: ''
 
                                                                    # ]]]
 influxdb_database_username: 'john'
