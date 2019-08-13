@@ -1,13 +1,13 @@
 ---
 # .. vim: foldmarker=[[[,]]]:foldmethod=marker
 
-# debops.influxdb default variables [[[
-# ====================================
+# debops.influxdb default variables
+# =================================
 
 # .. contents:: Sections
 #    :local:
 #
-# .. include:: ../../../includes/global.rst
+# .. include:: ../../../../includes/global.rst
 
 
 # InfluxDB server configuration [[[
@@ -18,7 +18,7 @@
 
 # .. envvar:: influxdb__base_packages [[[
 #
-# List of APT packages which are required by the InfluxDB application.
+# List of APT base packages which are required by the InfluxDB application.
 influxdb__base_packages: [ 'influxdb' ]
 
                                                                    # ]]]
@@ -30,25 +30,25 @@ influxdb__packages: [ 'influxdb-dev' ]
                                                                    # ]]]
 # .. envvar:: influxdb__group_packages [[[
 #
-# List of APT packages to install on a group of hosts in Ansible inventory.
+# List of APT packages to install on a group of hosts in InfluxDB inventory.
 influxdb__group_packages: []
 
                                                                    # ]]]
 # .. envvar:: influxdb__host_packages [[[
 #
-# List of APT packages to install on specific hosts in Ansible inventory.
+# List of APT packages to install on specific hosts in InfluxDB inventory.
 influxdb__host_packages: []
 
                                                                    # ]]]
 # .. envvar:: influxdb__dependent_packages [[[
 #
-# List of APT packages to install specified by other Ansible roles.
+# List of APT packages to install specified by other InfluxDB roles.
 influxdb__dependent_packages: []
                                                                    # ]]]
                                                                    # ]]]
 # .. envvar:: influxdb__upstream_apt_key [[[
 #
-# The OpenPGP key of the Influxdb upstream APT repository.
+# The InfluxDB key of the Influxdb upstream APT repository.
 influxdb__upstream_apt_key: 'https://repos.influxdata.com/influxdb.key'
 
                                                                    # ]]]
@@ -58,22 +58,14 @@ influxdb__upstream_apt_key: 'https://repos.influxdata.com/influxdb.key'
 influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
 
                                                                    # ]]]
-# influxdb__upstream_enabled: '{{ True
-#                                 if (ansible_distribution_release in
-#                                     [ "jessie", "stretch", "trusty", "xenial" ])
-#                                 else influxdb__dependent_upstream_enabled }}'
-
 influxdb__deploy_type: '{{ "upstream"
                             if (ansible_distribution_release in
                               [ "wheezy", "jessie", "precise", "trusty", "xenial" ])
                             else "system" }}'
-
 influxdb__dependent_upstream_enabled: False
-
-
 # .. envvar:: influxdb__keyring__dependent_apt_keys [[[
 #
-# Configuration for the :ref:`debops.keyring` Ansible role.
+# Configuration for the :ref:`debops.keyring` InfluxDB role.
 influxdb__keyring__dependent_apt_keys:
 
   - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
@@ -81,13 +73,12 @@ influxdb__keyring__dependent_apt_keys:
     state: '{{ "present" if (influxdb__deploy_type == "upstream") else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]
-
 # Configuration for other Ansible roles [[[
 # -----------------------------------------
 
 # .. envvar:: influxdb__ferm__dependent_rules [[[
 #
-# Configuration for :ref:`debops.ferm` Ansible role.
+# Configuration for :ref:`debops.ferm` InfluxDB role.
 influxdb__ferm__dependent_rules:
 
   - type: 'accept'
@@ -117,24 +108,20 @@ influxdb__allow: [ '0.0.0.0/0' ]
 # .. envvar:: influxdb__hostname [[[
 #
 # Hostname added to the IQN to create Initiator Name.
-influxdb_hostname: ''
+influxdb__hostname: ''
 
                                                                    # ]]]
-influxdb_database_username: 'john'
+influxdb__database_username: 'john'
 # influxdb_password: 's3cr3t'   aparent e o problema cu parola
-influxdb_ip_address: '192.168.3.242'
-influxdb_database_name: 'bechea'
-
-
-
-python__enabled: True
-
+influxdb__ip_address: '192.168.3.242'
+influxdb__database_name: 'bechea'
+# python__enabled: True
 # Configuration for other Ansible roles [[[
 # ----------------------------------------
 
 # .. envvar:: influxdb__python__dependent_packages2 [[[
 #
-# Configuration for the :ref:`debops.python` Ansible role.
+# Configuration for the :ref:`debops.python` InfluxDB role.
 influxdb__python__dependent_packages2:
 
   - 'python-influxdb'
@@ -142,7 +129,7 @@ influxdb__python__dependent_packages2:
                                                                    # ]]]
 # .. envvar:: influxdb__python__dependent_packages3 [[[
 #
-# Configuration for the :ref:`debops.python` Ansible role.
+# Configuration for the :ref:`debops.python` InfluxDB role.
 influxdb__python__dependent_packages3:
 
   - 'python3-influxdb'

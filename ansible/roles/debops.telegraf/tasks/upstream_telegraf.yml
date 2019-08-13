@@ -7,8 +7,8 @@
     version: '{{ telegraf__upstream_version }}'
     verify_commit: True
 
-- name: Symlink the upstream yadm binary in $PATH
+- name: Symlink the upstream telegraf binary in $PATH
   file:
-    dest: '{{ yadm__upstream_link }}'
-    src: '{{ yadm__upstream_dest + "/yadm" }}'
+    dest: '{{ telegraf__upstream_link }}'
+    src: '{{ telegraf__upstream_dest + "/yadm" }}'
     state: 'link'
