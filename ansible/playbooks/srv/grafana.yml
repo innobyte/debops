@@ -1,7 +1,7 @@
 ---
 
 - name: Manage Grafana server
-  hosts: [ 'debops_service_grafana', 'debops_grafana' ]
+  hosts: [ 'debops_service_grafana_server', 'debops_grafana_server' ]
   become: True
 
   environment: '{{ inventory__environment | d({})
@@ -13,10 +13,10 @@
     - role: debops.python
       tags: [ 'role::python', 'skip::python' ]
 
-    - role: debops.grafana
-      tags: [ 'role::grafana', 'skip::grafana' ]
+    - role: debops.grafana_server
+      tags: [ 'role::grafana_server', 'skip::grafana_server' ]
 
     - role: debops.ferm
       tags: [ 'role::ferm', 'skip::ferm' ]
       ferm__dependent_rules:
-        - '{{ grafana__ferm__dependent_rules }}'
+        - '{{ grafana_server__ferm__dependent_rules }}'

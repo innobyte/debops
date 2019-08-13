@@ -19,13 +19,13 @@
     user_name: john
     user_password: s3cr3t
     admin: yes
-    hostname: "{{ influxdb_hostname }}"
+    hostname: "{{ influxdb__hostname }}"
     # login_username: "{{ influxdb_username }}"
     # login_password: "{{ influxdb_password }}"
 
 - name: Create database
   influxdb_database:
-    hostname: "{{ influxdb_ip_address }}"
-    username: "{{ influxdb_database_username }}"
+    hostname: "{{ influxdb__ip_address }}"
+    username: "{{ influxdb__database_username }}"
     # password: "{{ influxdb_password }}"
-    database_name: "{{ influxdb_database_name }}"
+    database_name: "{{ influxdb__database_name }}"
