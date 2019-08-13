@@ -1,12 +1,12 @@
 ---
 
-- name: Restart grafana
+- name: Restart grafana-server
   service:
     name: 'grafana-server'
     state: 'restarted'
     enabled: yes
 
-- name: Reload grafana
+- name: Reload grafana-server
   service:
     name: 'grafana-server'
     state: 'reloaded'
