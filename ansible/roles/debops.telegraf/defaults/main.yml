@@ -1,13 +1,13 @@
 ---
 # .. vim: foldmarker=[[[,]]]:foldmethod=marker
 
-# debops.influxdb default variables [[[
-# ====================================
+# debops.telegraf default variables
+# =================================
 
 # .. contents:: Sections
 #    :local:
 #
-# .. include:: ../../../includes/global.rst
+# .. include:: ../../../../includes/global.rst
 
 
 # Telegraf server configuration [[[
@@ -16,7 +16,7 @@
 
 # .. envvar:: telegraf__upstream_apt_key [[[
 #
-# The OpenPGP key of the Telegraf upstream APT repository.
+# The Telegraf key of the Telegraf upstream APT repository.
 telegraf__upstream_apt_key: 'https://repos.influxdata.com/influxdb.key'
 
                                                                    # ]]]
@@ -50,7 +50,7 @@ telegraf__deploy_type: "upstream"
 
 # .. envvar:: telegraf__base_packages [[[
 #
-# List of APT packages which are required by the Telegraf application.
+# List of APT base packages which are required by the Telegraf application.
 telegraf__base_packages: [ 'telegraf' ]
 
                                                                    # ]]]
@@ -63,16 +63,16 @@ telegraf__packages: [ 'apt-transport-https' ]
 # Upstream telegraf installation [[[
 # ------------------------------
 
-# .. envvar:: telegraf__upstream_enabled [[[
+# .. envvar:: telegraf__dependent_upstream_enabled [[[
 #
-# Enable or disable installation of the :command:`yadm` script from upstream
+# Enable or disable installation of the :command:`telegraf` script from upstream
 # :command:`git` repository.
 telegraf__dependent_upstream_enabled: False
 
                                                                    # ]]]
 # .. envvar:: telegraf__keyring__dependent_apt_keys [[[
 #
-# Configuration for the :ref:`debops.keyring` Ansible role.
+# Configuration for the :ref:`debops.keyring` Telegraf role.
 telegraf__keyring__dependent_apt_keys:
 
   - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
@@ -84,8 +84,7 @@ telegraf__keyring__dependent_apt_keys:
 # .. envvar:: telegraf__allow [[[
 #
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
-# Telegraf server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
-# connections are not allowed.
+# Telegraf server. If it's empty, remote connections are not allowed.
 telegraf__allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
@@ -171,7 +170,7 @@ telegraf__default_configuration:
                                                                    # ]]]
 # .. envvar:: telegraf__configuration [[[
 #
-# List of configuration options defined on all hosts in the Ansible inventory.
+# List of configuration options defined on all hosts in the Telegraf inventory.
 telegraf__configuration: []
 
                                                                    # ]]]
