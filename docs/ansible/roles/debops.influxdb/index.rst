@@ -11,6 +11,7 @@ InfluxDB upstream APT repository, or using a locally built ``.deb`` package.
    :maxdepth: 2
 
    getting-started
+   defaults-detailed
    defaults/main
 
 Copyright

@@ -65,7 +65,7 @@ influxdb__deploy_type: '{{ "upstream"
 influxdb__dependent_upstream_enabled: False
 # .. envvar:: influxdb__keyring__dependent_apt_keys [[[
 #
-# Configuration for the :ref:`debops.keyring` InfluxDB role.
+# Configuration for the :ref:`debops.keyring` Ansible role.
 influxdb__keyring__dependent_apt_keys:
 
   - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
@@ -105,23 +105,49 @@ influxdb__ferm__dependent_rules:
 influxdb__allow: [ '0.0.0.0/0' ]
 
                                                                    # ]]]
+# Databases, user accounts [[[
+# ----------------------------
+
+# .. envvar:: influxdb__password_length [[[
+#
+# Length of automatically generated user accounts, saved in the ``secret/``
+# directory. See :ref:`debops.secret` role for more details about passwords.
+influxdb__password_length: '48'
+
+                                                                   # ]]]
 # .. envvar:: influxdb__hostname [[[
 #
 # Hostname added to the IQN to create Initiator Name.
-influxdb__hostname: ''
+influxdb__hostname: '{{ ansible_hostname }}'
 
                                                                    # ]]]
-influxdb__database_username: 'john'
-# influxdb_password: 's3cr3t'   aparent e o problema cu parola
-influxdb__ip_address: '192.168.3.242'
-influxdb__database_name: 'bechea'
-# python__enabled: True
+infludb__users: []
+influxdb__dependent_users: []
+# .. envvar:: influxdb__default_privileges_grant [[[
+#
+# Default privileges granted automatically.
+influxdb__default_privileges_grant: 'ALL'
+                                                                   # ]]]
+# .. envvar:: influxdb__databases [[[
+#
+# List of databases configured on the InfluxDB.
+influxdb__databases: []
+
+                                                                   # ]]]
+influxdb__dependent_databases: []
+
+# influxdb__database_username: 'john'
+# # influxdb_password: 's3cr3t'   aparent e o problema cu parola
+# influxdb__ip_address: '192.168.3.203'
+# influxdb__database_name: 'bechea'
+
+python__enabled: True
 # Configuration for other Ansible roles [[[
 # ----------------------------------------
 
 # .. envvar:: influxdb__python__dependent_packages2 [[[
 #
-# Configuration for the :ref:`debops.python` InfluxDB role.
+# Configuration for the :ref:`debops.python` Ansible role.
 influxdb__python__dependent_packages2:
 
   - 'python-influxdb'
@@ -129,7 +155,7 @@ influxdb__python__dependent_packages2:
                                                                    # ]]]
 # .. envvar:: influxdb__python__dependent_packages3 [[[
 #
-# Configuration for the :ref:`debops.python` InfluxDB role.
+# Configuration for the :ref:`debops.python` Ansible role.
 influxdb__python__dependent_packages3:
 
   - 'python3-influxdb'
