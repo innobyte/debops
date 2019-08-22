@@ -1,0 +1,34 @@
+---
+
+- name: Install and configure Ansible
+  hosts: [ 'debops_service_jenkins' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: debops.keyring
+      tags: [ 'role::keyring', 'skip::keyring', 'role::jenkins' ]
+      keyring__dependent_apt_keys:
+        - '{{ jenkins__keyring__dependent_apt_keys }}'
+
+    - role: debops.java
+      tags: [ 'role::java', 'skip::java' ]
+
+    #    - role: debops.ferm
+#      tags: [ 'role::ferm', 'skip::ferm' ]
+#      ferm__dependent_rules:
+#        - '{{ nginx__ferm__dependent_rules }}'
+
+    - role: debops.jenkins
+      tags: [ 'role::jenkins', 'skip::jenkins' ]
+
+#    - role: debops.nginx
+#      tags: [ 'role::nginx', 'skip::nginx' ]
+#      nginx__dependent_servers:
+#        - '{{ kibana__nginx__dependent_servers }}'
+#      nginx__dependent_upstreams:
+#        - '{{ kibana__nginx__dependent_upstreams }}'

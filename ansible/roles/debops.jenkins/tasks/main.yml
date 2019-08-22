@@ -1,0 +1,15 @@
+---
+
+- name: Install required packages
+  package:
+    name: '{{ q("flattened", (jenkins__base_packages
+                              + jenkins__packages)) }}'
+    state: 'present'
+  register: jenkins__register_packages
+  until: jenkins__register_packages is succeeded
+
+- name: Start Jenkins on first install
+  service:
+    name: 'jenkins'
+    state: 'started'
+  when: (jenkins__register_packages|d() and jenkins__register_packages is changed)
