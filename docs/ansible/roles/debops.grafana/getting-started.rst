@@ -8,12 +8,12 @@ Getting started
 Example inventory
 -----------------
 
-To install Grafana Server on a host, it needs to be added to a specific Ansible
+To install Grafana on a host, it needs to be added to a specific Ansible
 inventory group:
 
 .. code-block:: none
 
-   [debops_service_grafana_server]
+   [debops_service_grafana]
    hostname
 
 
@@ -23,7 +23,7 @@ Example playbook
 If you are using this role without DebOps, here's an example Ansible playbook
 that uses the ``debops.grafana_server`` role:
 
-.. literalinclude:: ../../../../ansible/playbooks/service/grafana_server.yml
+.. literalinclude:: ../../../../ansible/playbooks/service/grafana.yml
    :language: yaml
 
 
@@ -37,6 +37,6 @@ configuration is already in the desired state.
 
 Available role tags:
 
-``role::grafana_server``
+``role::grafana``
   Main role tag, should be used in the playbook to execute all of the role
   tasks as well as role dependencies.

@@ -1,0 +1,20 @@
+---
+- name: Add Grafana APT key
+  apt_key:
+    url: '{{ grafana__apt_repository_key_url }}'
+    state: 'present'
+
+- name: Add Grafana APT repository
+  apt_repository:
+    repo: '{{ grafana__upstream_apt_repository }}'
+    state: 'present'
+    mode: '0644'
+
+- name: Install requested packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+  with_flattened:
+    - '{{ grafana__base_packages }}'
+    - '{{ grafana__packages }}'
+  notify: [ 'Restart grafana' ]

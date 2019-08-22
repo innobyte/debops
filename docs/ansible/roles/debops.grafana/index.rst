@@ -1,7 +1,7 @@
 .. _debops.grafana:
 
-debops.grafana_server
-=====================
+debops.grafana
+==============
 
 The ``debops.grafana`` role can be used to install Grafana on a Debian or
 Ubuntu host. Grafana will be installed either from the OS repositories, from
@@ -16,7 +16,7 @@ Grafana upstream APT repository, or using a locally built ``.deb`` package.
 Copyright
 ---------
 
-.. literalinclude:: ../../../../ansible/roles/debops.grafana_server/COPYRIGHT
+.. literalinclude:: ../../../../ansible/roles/debops.grafana/COPYRIGHT
 
 ..
  Local Variables:

@@ -72,7 +72,7 @@ telegraf__dependent_upstream_enabled: False
                                                                    # ]]]
 # .. envvar:: telegraf__keyring__dependent_apt_keys [[[
 #
-# Configuration for the :ref:`debops.keyring` Telegraf role.
+# Configuration for the :ref:`debops.keyring` Ansible role.
 telegraf__keyring__dependent_apt_keys:
 
   - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
@@ -93,8 +93,6 @@ telegraf__allow: [ '0.0.0.0/0' ]
 
 # The variables below define the contents of the
 # :file:`/etc/telegraf/telegraf.conf` configuration file.
-# See :ref:`telegraf__ref_configuration` for the details and configuration
-# syntax.
 
 # .. envvar:: telegraf__default_configuration [[[
 #
@@ -102,7 +100,7 @@ telegraf__allow: [ '0.0.0.0/0' ]
 # configuration file.
 telegraf__default_configuration:
 
-  - name: global_tags
+  - name: 'global_tags'
     options:
       - dc: '"us-east-1"'
         rack: '"1a"'
