@@ -14,6 +14,15 @@
   until: influxdb__register_install is succeeded
   notify: [ 'Reload influxdb' ]
 
+- name: Install required Python modules
+  pip:
+    name: '{{ item }}'
+    state: 'latest'
+  with_items: '{{ influxdb__pip_packages }}'
+  register: influxdb__register_pip_install
+  until: influxdb__register_pip_install is succeeded
+  when: influxdb__pip_packages|d()
+
 # - name: Create an admin user on a remote host using custom login credentials
 #   influxdb_user:
 #     user_name: john
@@ -52,17 +61,15 @@
          (item.state is undefined or item.state != 'absent'))
   register: influxdb__register_database_status
 
-
 - name: Drop user
   influxdb_user:
     user_name: '{{ item.user_name | d(item.name) }}'
     # user_password: '{{ item.user_password }}'
-    # hostname: '{{ item.hostname | default(influxdb__hostname) }}'
+    hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     state: 'absent'
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   when: ((item.user_name|d(False)) and
          (item.state is defined and item.state == "absent"))
-  # no_log: True
 
 - name: Create user
   influxdb_user:
@@ -71,27 +78,13 @@
                   secret + "/influxdb/" +
                   "/credentials/" + item.user_name | d(False) + "/password " +
                   "length=" + influxdb__password_length)) }}'
-    admin: '{{ item.admin | d(omit) }}'
+    # admin: '{{ item.admin | d(omit) }}'
     grants: '{{ item.grants | d(omit) }}'
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
-    login_username: '{{ item.login_username }}'
-    login_password: '{{ item.login_password }}'
+    login_username: '{{ item.login_username | d(omit) }}'
+    login_password: '{{ item.login_password | d(omit) }}'
     state: 'present'
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   register: influxdb__register_create_users
   when: ((item.user_name|d(False) or item.user_password|d(False) or item.login_username|d(False) or item.login_password|d(False)) and
          (item.state is undefined or item.state != "absent"))
-  # no_log: True
-
-# - name: Grant default privileges to users
-#   influxdb_user:
-#     user_name: '{{ item.0.user_name | d(item.0.name) }}'
-#     # hostname: '{{ item.0.hostname | default(influxdb__hostname) }}'
-#     grants: '{{ (item.0.database_name | d(item.0.name)) + influxdb__default_privileges_grant }}'
-#   with_together:
-#     - '{{ influxdb__users + lookup("flattened", influxdb__dependent_users, wantlist=True) }}'
-#     - '{{ influxdb__register_create_users.results }}'
-#   when: ((item.0.user_name|d(False)) and
-#          (item.0.state is undefined or item.0.state != "absent") and
-#          influxdb__default_privileges|d(False) and
-#          (item.0.grants is undefined or item.0.grants))
