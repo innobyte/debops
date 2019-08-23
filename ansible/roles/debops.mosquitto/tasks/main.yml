@@ -15,14 +15,7 @@
   register: mosquitto__register_packages
   until: mosquitto__register_packages is succeeded
 
-- name: Install required Python modules
-  pip:
-    name: '{{ item }}'
-    state: 'present'
-  with_items: '{{ mosquitto__pip_packages }}'
-  register: mosquitto__register_pip_install
-  until: mosquitto__register_pip_install is succeeded
-  when: mosquitto__pip_packages|d()
+
 
 - name: Check the installed Mosquitto version
   shell: set -o nounset -o pipefail -o errexit &&
