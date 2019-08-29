@@ -68,6 +68,9 @@
         - '{{ netbase__python__dependent_packages2 }}'
         - '{{ ldap__python__dependent_packages2 }}'
 
+    - role: debops.resolvconf
+      tags: [ 'role::resolvconf', 'skip::resolvconf' ]
+
     - role: debops.netbase
       tags: [ 'role::netbase', 'skip::netbase' ]
 
@@ -112,6 +115,9 @@
 
     - role: debops.nslcd
       tags: [ 'role::nslcd', 'skip::nslcd' ]
+
+    - role: debops.nscd
+      tags: [ 'role::nscd', 'skip::nscd' ]
 
     - role: debops.keyring
       tags: [ 'role::keyring', 'skip::keyring', 'role::yadm' ]

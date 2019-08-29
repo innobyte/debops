@@ -60,8 +60,14 @@
       python__dependent_packages2:
         - '{{ netbase__python__dependent_packages2 }}'
 
+    - role: debops.resolvconf
+      tags: [ 'role::resolvconf', 'skip::resolvconf' ]
+
     - role: debops.netbase
       tags: [ 'role::netbase', 'skip::netbase' ]
+
+    - role: debops.apt_proxy
+      tags: [ 'role::apt_proxy', 'skip::apt_proxy' ]
 
     - role: debops.apt
       tags: [ 'role::apt', 'skip::apt' ]

@@ -16,7 +16,63 @@ You can read information about required changes between releases in the
 `debops master`_ - unreleased
 -----------------------------
 
-.. _debops master: https://github.com/debops/debops/compare/v1.0.0...master
+.. _debops master: https://github.com/debops/debops/compare/v1.1.0...master
+
+Added
+~~~~~
+
+General
+'''''''
+
+- Add more entries to be ignored by default by the :command:`git` command in
+  the DebOps project directories:
+
+  - :file:`debops`: ignore DebOps monorepo cloned or symlinked into the project
+    directory.
+
+  - :file:`roles` and :file:`playbooks`: ignore roles and playbooks in
+    development; production code should be put in the :file:`ansible/roles/`
+    and the :file:`ansible/playbooks/` directories respectively.
+
+:ref:`debops.apt_install` role
+''''''''''''''''''''''''''''''
+
+- The `open-vm-tools`__ APT package will be installed by default in VMware
+  virtual machines.
+
+  .. __: https://github.com/vmware/open-vm-tools
+
+Changed
+~~~~~~~
+
+:ref:`debops.sshd` role
+'''''''''''''''''''''''
+
+- The role will allow or deny access to the ``root`` account via password
+  depending on the presence of the :file:`/root/.ssh/authorized_keys` file. See
+  :ref:`sshd__ref_root_password` for more details. This requires updated
+  :file:`root_account.fact` script from the :ref:`debops.root_account` role.
+
+- The role will use Ansible local facts to check if OpenSSH server package is
+  installed to conditionally enable/disable its start on first install.
+
+Fixed
+~~~~~
+
+:ref:`debops.nfs_server` role
+'''''''''''''''''''''''''''''
+
+- In the :envvar:`nfs_server__firewall_ports` variable, convert the
+  ``dict_keys`` view into a list due to `change in Python 3 implementation`__
+  of dictionaries.
+
+  .. __: https://docs.ansible.com/ansible/latest/user_guide/playbooks_python_version.html#dictionary-views
+
+
+`debops v1.1.0`_ - 2019-08-25
+-----------------------------
+
+.. _debops v1.1.0: https://github.com/debops/debops/compare/v1.0.0...v1.1.0
 
 Added
 ~~~~~
@@ -43,6 +99,22 @@ New DebOps roles
 - The :ref:`debops.wpcli` role can be used to install the WP-CLI framework to
   allow management of WordPress websites in a shared hosting environment.
 
+- The :ref:`debops.nscd` role configures the Name Service Cache Daemon, used to
+  cache NSS entries from remote databases, for example LDAP, Active Directory
+  or NIS. The role is included in the :file:`bootstrap-ldap.yml` playbook.
+
+- The :ref:`debops.backup2l` role configures the `backup2l`__ script which can
+  create differential backups of a given host and store them on an external
+  hard drive connected to that host.
+
+  .. __: https://gkiefer.github.io/backup2l/
+
+- The :ref:`debops.resolvconf` role fixes a few issues in the ``resolvconf``
+  Debian package and modifies the interface order in the generated
+  :file:`/etc/resolv.conf` configuration file depending on presence of a local
+  DNS resolver like ``dnsmasq`` or ``unbound``. The role is included in the
+  bootstrap and common playbooks.
+
 Continuous Integration
 ''''''''''''''''''''''
 
@@ -59,6 +131,11 @@ General
   when the project is installed with Ansible included. This package is required
   by the ``openssl_*`` modules in Ansible 2.7; some of the DebOps roles like
   :ref:`debops.opendkim` use these modules on the Ansible Controller.
+
+- The ``distro`` Python package has been added as the DebOps dependency. The
+  package is used by the :command:`debops-init` script to detect the operating
+  system used on the Ansible Controller, and is a replacement for the
+  deprecated ``platform.linux_distribution()`` function.
 
 LDAP
 ''''
@@ -77,6 +154,14 @@ LDAP
   happen on workstations and laptops with full desktop environments installed,
   but not on servers with minimal install. To configure Avahi service or enable
   it on servers, you can use the :ref:`debops.avahi` Ansible role.
+
+:ref:`debops.libvirtd` role
+'''''''''''''''''''''''''''
+
+- The role will configure the ``libvirt`` and ``libvirt_guest`` NSS modules in
+  :file:`/etc/nsswitch.conf` database using the :ref:`debops.nsswitch` role to
+  allow accessing the virtual machines or containers via their hostnames on the
+  virtual machine host.
 
 :ref:`debops.lxc` role
 ''''''''''''''''''''''
@@ -214,13 +299,27 @@ General
   Ansible 2.11.
 
 - The DebOps documentation generator now supports Ansible roles with multiple
-  :file:`defaults/main/*.yml` files.
+  :file:`defaults/main/*.yml` files. They are also correctly handled by the
+  :command:`debops-defaults` script.
 
 - Various DebOps roles will no longer use the hostname as a stand-in for an
   empty DNS domain when no DNS domain is detected - this resulted in the
   "standalone" hosts without a DNS domain to be misconfigured. Existing setups
   with a DNS domain shouldn't be affected, but configuration of standalone
   hosts that deploy webservices might require modifications.
+
+- The :ref:`debops.resolvconf` role has been added as a dpendency in the
+  Ansible playbooks of the roles that interact with the ``resolvconf`` service
+  in some way. The modified roles are: :ref:`debops.dnsmasq`,
+  :ref:`debops.docker_server`, :ref:`debops.ifupdown`, :ref:`debops.lxc`,
+  :ref:`debops.unbound`. The installation of the ``resolvconf`` APT package has
+  been removed from the roles that contained it.
+
+- Run :ref:`debops.apt_proxy` from the :file:`bootstrap.yml` Ansible playbook
+  to ensure that if a proxy is used, it is used all the time without disabling
+  the proxy for a short while during bootstrapping.
+  The :file:`bootstrap-ldap.yml` Ansible playbook already included
+  :ref:`debops.apt_proxy`.
 
 User management
 '''''''''''''''
@@ -229,6 +328,15 @@ User management
   account <debops.root_account>`, :ref:`any system users <debops.system_users>`
   or :ref:`regular users <debops.users>` managed by Ansible are using it as
   a login shell.
+
+:ref:`debops.avahi` role
+''''''''''''''''''''''''
+
+- The :command:`avahi-alias` script has been imported into the role itself and
+  will no longer be installed by cloning the upstream :command:`git`
+  repository. Consequently, support for mDNS ``*.local`` CNAME resource records
+  will be enabled by default on hosts with Python 2.7 installed (support for
+  Python 3.x is currently not available).
 
 :ref:`debops.dokuwiki` role
 '''''''''''''''''''''''''''
@@ -251,6 +359,14 @@ User management
 
 - The Docker server no longer listens on a TCP port by default, even if
   :ref:`debops.pki` is enabled.
+
+- The default storage driver used by the :ref:`debops.docker_server` has been
+  changed to ``overlay2`` which is the default in upstream. The role checks the
+  currently enabled storage driver via Ansible local facts, and should preserve
+  the current configuration on existing installations.
+
+  If needed, the storage driver in use can be overridden via the
+  :envvar:`docker_server__storage_driver` variable.
 
 :ref:`debops.etckeeper` role
 ''''''''''''''''''''''''''''
@@ -294,6 +410,10 @@ User management
   script will use the :command:`lsmod` command to list the kernel modules in
   this case.
 
+- The role gained basic support for defining what kernel modules should be
+  loaded on non-systemd hosts by adding them in the :file:`/etc/modules`
+  configuration file.
+
 :ref:`debops.libvirt` role
 ''''''''''''''''''''''''''
 
@@ -330,11 +450,6 @@ User management
 - Restrict configuration of the :file:`poweroff.conf` :command:`systemd`
   override to Debian Stretch and Ubuntu Xenial only. The containers correctly
   shut down using ``SIGRTMIN+3`` signal on Debian Buster and beyond.
-
-- The :envvar:`lxc__net_fqdn` variable will now define both the DNS domain for
-  the LXC containers as well as the DNS name of the ``lxcbr0`` interface. This
-  should ensure that both the LXC host and the containers see the same DNS
-  name for the same resource.
 
 :ref:`debops.mariadb_server` role
 '''''''''''''''''''''''''''''''''
@@ -396,6 +511,14 @@ User management
   replicated if needed. The backup host itself can also be snapshotted, with
   support for snapshots on removable media.
 
+:ref:`debops.snmpd` role
+''''''''''''''''''''''''
+
+- The local SNMPv3 username and password will be stored in a separate file and
+  retrieved via Ansible local facts, to not break Ansible fact gathering on
+  unprivileged accounts. The password file is protected by strict read
+  permission and accessible only by the ``root`` UNIX account.
+
 :ref:`debops.system_groups` role
 ''''''''''''''''''''''''''''''''
 
@@ -444,6 +567,21 @@ Roles removed from DebOps
 - The ``core__keyserver`` variable and its local fact have been removed from
   the role. They are replaced by the :envvar:`keyring__keyserver` and the
   corresponding local fact in the :ref:`debops.keyring` role.
+
+- The :command:`resolver.fact` script has been removed from the role. Its
+  functionality is provided by the :command:`resolvconf.fact` script included
+  in the :ref:`debops.resolvconf` role.
+
+:ref:`debops.docker_server` role
+''''''''''''''''''''''''''''''''
+
+- Support for `ferment`__ has been removed from DebOps due to the upstream not
+  being up to date anymore, both with Docker as well as with Python 3.x
+  support. The :command:`dockerd` daemon will be restarted on any
+  :command:`ferm` restarts to update the firewall configuration with Docker
+  rules.
+
+  .. __: https://github.com/diefans/ferment
 
 :ref:`debops.lxc` role
 ''''''''''''''''''''''
@@ -548,7 +686,7 @@ General
 LDAP
 ''''
 
-- A new ``bootstrap-ldap.yml`` Ansible playbook can be used to bootstrap
+- A new :file:`bootstrap-ldap.yml` Ansible playbook can be used to bootstrap
   Debian/Ubuntu hosts with LDAP support enabled by default. The playbook will
   configure only the services required for secure LDAP access (PKI, SSH,
   PAM/NSS), the rest should be configured using the common playbook.

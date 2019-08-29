@@ -7,8 +7,10 @@ import subprocess
 
 try:
     import pypandoc
-    README = pypandoc.convert('README.md', 'rst')
+    README = pypandoc.convert_file('README.md', 'rst')
 except(IOError, ImportError):
+    print('Warning: The "pandoc" support is required to convert '
+          'the README.md to reStructuredText format')
     README = open('README.md').read()
 
 try:
@@ -59,7 +61,7 @@ try:
     setup(
         name="debops",
         version=unicode(RELEASE),
-        install_requires=['argparse', 'future'],
+        install_requires=['argparse', 'distro', 'future'],
         extras_require={
             'ansible': ['ansible', 'netaddr', 'passlib',
                         'python-ldap', 'dnspython', 'pyopenssl']

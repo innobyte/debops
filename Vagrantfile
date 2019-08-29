@@ -21,6 +21,9 @@
 #     VAGRANT_NODE_BOX="debian/buster64"
 #         Specify the box to use for nodes.
 #
+#     ANSIBLE_FROM="debian" / ANSIBLE_FROM="pypi" / ANSIBLE_FROM="devel"
+#         Specify the way to install ansible.
+#
 #     VAGRANT_HOSTNAME="buster"
 #         Set a custom hostname after the box boots up.
 #
@@ -286,6 +289,7 @@ export CI_JOB_STAGE="#{ENV['CI_JOB_STAGE']}"
 export JANE_TEST_PLAY="#{ENV['JANE_TEST_PLAY']}"
 export JANE_TEST_FACT="#{ENV['JANE_TEST_FACT']}"
 export JANE_TEST_SCRIPT="#{ENV['JANE_TEST_SCRIPT']}"
+export JANE_IGNORE_IDEMPOTENCY="#{ENV['JANE_IGNORE_IDEMPOTENCY']}"
 export JANE_FORCE_TESTS="#{ENV['JANE_FORCE_TESTS']}"
 export JANE_INVENTORY_DIRS="#{ENV['JANE_INVENTORY_DIRS']}"
 export JANE_INVENTORY_GROUPS="#{ENV['JANE_INVENTORY_GROUPS']}"
@@ -372,6 +376,7 @@ EOF
         jq \
         make \
         python-apt \
+        python-distro \
         python-dnspython \
         python-future \
         python-jinja2 \
@@ -393,6 +398,7 @@ EOF
         python-yaml \
         python3 \
         python3-apt \
+        python3-distro \
         python3-dnspython \
         python3-future \
         python3-jinja2 \
@@ -415,12 +421,26 @@ EOF
         shellcheck \
         yamllint
 
+    # Install packages needed to build missing Python modules
+    if [ "${os_release}" == "wheezy" ] || [ "${os_release}" == "jessie" ] || [ "${os_release}" == "stretch" ] ; then
+
+        DEBIAN_FRONTEND=noninteractive apt-get -y \
+        --no-install-recommends install \
+            build-essential \
+            libffi-dev \
+            libldap2-dev \
+            libsasl2-dev \
+            libssl-dev \
+            python-dev \
+            python3-dev
+    fi
+
     if [ ! "${os_release}" == "wheezy" ] && [ ! "${os_release}" == "jessie" ] && [ ! "${os_release}" == "stretch" ] ; then
 
         DEBIAN_FRONTEND=noninteractive apt-get -y \
         --no-install-recommends install \
             python3-ldap
-        fi
+    fi
 
     DEBIAN_FRONTEND=noninteractive apt-get -y \
     --no-install-recommends install ${ansible_from_debian}
@@ -683,7 +703,7 @@ VAGRANT_HOSTNAME_MASTER = (ENV['VAGRANT_DOTFILE_PATH'] || '.vagrant') + '/vagran
 if File.exist? VAGRANT_HOSTNAME_MASTER
       master_hostname = IO.read( VAGRANT_HOSTNAME_MASTER ).strip
 else
-      master_hostname = "debops-#{SecureRandom.hex(3)}"
+      master_hostname = ENV['VAGRANT_HOSTNAME'] || "debops-#{SecureRandom.hex(3)}"
       IO.write( VAGRANT_HOSTNAME_MASTER, master_hostname )
 end
 master_fqdn = master_hostname + '.' + VAGRANT_DOMAIN
@@ -776,7 +796,8 @@ Vagrant.configure("2") do |config|
         subconfig.vm.provider "libvirt" do |libvirt, override|
             # On a libvirt provider, default sync method is NFS. If we switch
             # it to 'rsync', this will drop the dependency on NFS on the host.
-            override.vm.synced_folder ENV['CI_PROJECT_DIR'] || ".", "/vagrant", type: "rsync"
+            override.vm.synced_folder ENV['CI_PROJECT_DIR'] || ".", "/vagrant", type: "rsync", \
+                                      rsync__exclude: ['.git/', 'build/', 'docs/', '*.box' ]
 
             libvirt.random_hostname = true
             libvirt.memory = ENV['VAGRANT_MASTER_MEMORY'] || '1024'
