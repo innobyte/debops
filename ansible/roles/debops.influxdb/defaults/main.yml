@@ -115,6 +115,7 @@ influxdb__hostname: '{{ ansible_hostname }}'
 # .. envvar:: influxdb__databases [[[
 #
 # List of databases configured on the InfluxDB.
+# :ref:`influxdb_database` for more details.
 influxdb__databases: []
 
                                                                    # ]]]
@@ -128,8 +129,8 @@ influxdb__dependent_databases: []
 # .. envvar:: mariadb__users [[[
 #
 # List of user accounts configured on the InfluxDB server. See
-# :ref:`influxdb__users` for more details.
-infludb__users: []
+# :ref:`influxdb_user` for more details.
+influxdb__users: []
 
                                                                    # ]]]
 # .. envvar:: influxdb__dependent_users [[[
@@ -191,4 +192,80 @@ influxdb__python__dependent_packages2: []
 influxdb__python__dependent_packages3: []
 
                                                                    # ]]]
+                                                                   # ]]]
+# InfluxDB configuration file [[[
+# ------------------------------------
+
+# The variables below define the contents of the
+# :file:`/etc/influxdb/influxdb.conf` configuration file.
+
+# .. envvar:: influxdb__default_configuration [[[
+#
+# The default configuration options which should be present in the main
+# configuration file.
+influxdb__default_configuration:
+
+  - name: 'meta'
+    options:
+      - dir: '"/var/lib/influxdb/meta"'
+
+  - name: 'data'
+    options:
+      - dir: '"/var/lib/influxdb/data"'
+      - wal-dir: '"/var/lib/influxdb/wal"'
+      - series-id-set-cache-size: '100'
+
+  - name: 'coordinator'
+    options: []
+
+  - name: 'retention'
+    options: []
+
+  - name: 'shard-precreation'
+    options: []
+
+  - name: 'monitor'
+    options: []
+
+  - name: 'http'
+    options: []
+
+  - name: 'logging'
+    options: []
+
+  - name: 'subscriber'
+    options: []
+
+  - name: 'graphite'
+    options: []
+
+  - name: 'collectd'
+    options: []
+
+  # - name: 'opentsdb'
+  #   options: []
+
+  # - name: 'udp'
+  #   options: []
+
+  - name: 'continuous_queries'
+    options: []
+
+  - name: 'tls'
+    options: []
+
+
+# .. envvar:: influxdb__configuration [[[
+#
+# List of configuration options defined on all hosts in the InfluxDB inventory.
+influxdb__configuration: []
+
+                                                                   # ]]]
+# .. envvar:: influxdb__combined_configuration [[[
+#
+# Actual list of InfluxDB configuration options passed to the
+# configuration template. This list defines the order in which the options from
+# different variables are processed.
+influxdb__combined_configuration: '{{ influxdb__default_configuration + influxdb__configuration }}'
+
                                                                    # ]]]

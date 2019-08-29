@@ -9,7 +9,7 @@ them.
    :local:
    :depth: 1
 
-.. _influxdb__databases:
+.. _influxdb_database:
 
 influxdb__databases
 -------------------
@@ -74,10 +74,7 @@ Create databases, remove some of the existing ones:
        database_name: 'dbname'
 
 
-
-
-
-
+.. _influxdb_user:
 
 influxdb__users
 ---------------
