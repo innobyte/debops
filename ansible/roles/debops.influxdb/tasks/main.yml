@@ -12,7 +12,7 @@
     - '{{ influxdb__dependent_packages }}'
   register: influxdb__register_install
   until: influxdb__register_install is succeeded
-  notify: [ 'Reload influxdb' ]
+  notify: [ 'Restart influxdb' ]
 
 - name: Install required Python modules
   pip:
@@ -23,22 +23,18 @@
   until: influxdb__register_pip_install is succeeded
   when: influxdb__pip_packages|d()
 
-# - name: Create an admin user on a remote host using custom login credentials
-#   influxdb_user:
-#     user_name: john
-#     user_password: s3cr3t
-#     admin: yes
-#     hostname: "{{ influxdb__hostname }}"
-#     # login_username: "{{ influxdb_username }}"
-#     # login_password: "{{ influxdb_password }}"
+- name: Divert the original influxdb configuration file
+  command: dpkg-divert --quiet --local --divert /etc/influxdb/influxdb.conf.dpkg-divert --rename /etc/influxdb/influxdb.conf
+  args:
+    creates: '/etc/influxdb/influxdb.conf.dpkg-divert'
 
-# - name: Create database
-#   influxdb_database:
-#     hostname: "{{ influxdb__ip_address }}"
-#     username: "{{ influxdb__database_username }}"
-#     # password: "{{ influxdb_password }}"
-#     database_name: "{{ influxdb__database_name }}"
-
+- name: Configure main influxdb config file
+  template:
+    src: 'influxdb.conf.j2'
+    dest: '/etc/influxdb/influxdb.conf'
+    owner: 'root'
+    group: 'adm'
+    mode: '0644'
 
 - name: Drop database
   influxdb_database:
@@ -88,3 +84,20 @@
   register: influxdb__register_create_users
   when: ((item.user_name|d(False) or item.user_password|d(False) or item.login_username|d(False) or item.login_password|d(False)) and
          (item.state is undefined or item.state != "absent"))
+
+- name: Make sure that Ansible local facts directory exists
+  file:
+    path: '/etc/ansible/facts.d'
+    state: 'directory'
+    mode: '0755'
+
+- name: Save telegraf local facts
+  template:
+    src: 'etc/ansible/facts.d/influxdb.fact.j2'
+    dest: '/etc/ansible/facts.d/influxdb.fact'
+    mode: '0755'
+  register: influxdb__register_facts
+
+- name: Update Ansible facts if they were modified
+  action: setup
+  when: influxdb__register_facts is changed

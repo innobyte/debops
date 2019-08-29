@@ -1,0 +1,35 @@
+
+{% for element in influxdb__combined_configuration | parse_kv_items %}
+{%   if element.name|d() and element.state|d('present') not in [ 'absent', 'ignore' ] %}
+
+{%     if element.name in [ 'graphite', 'collectd', 'opentsdb', 'udp' ] %}
+{{ '[[{}]]'.format(element.name) }}
+{%     else %}
+{{ '[{}]'.format(element.name) }}
+{%     endif %}
+{%     if element.options|d() %}
+{%       for thing in element.options %}
+{%         if thing.name|d() and thing.value|d() and thing.state|d('present') != 'absent' %}
+{{ '  {} = {}'.format(thing.name, thing.value) }}
+{%         endif %}
+{%       endfor %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+
+#[meta]
+#[data]
+#[coordinator]
+#[retention]
+#[shard-precreation]
+#[monitor]
+#[http]
+#[logging]
+#[subscriber]
+#
+#[[graphite]]
+#[[collectd]]
+#[[opentsdb]]
+#[[udp]]
+#[continuous_queries]
+#[tls]
