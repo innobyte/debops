@@ -23,7 +23,7 @@ telegraf__upstream_apt_id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
 # .. envvar:: telegraf__upstream_apt_repository [[[
 #
 # The URL of the Telegraf upstream :command:`git` repository.
-telegraf__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+telegraf__upstream_apt_repository: 'deb https://repos.influxdata.com/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable'
 
                                                                    # ]]]
 # Installation, APT packages [[[
@@ -60,16 +60,6 @@ telegraf__base_packages: [ 'telegraf' ]
 telegraf__packages: [ 'apt-transport-https' ]
 
                                                                    # ]]]
-# Upstream telegraf installation [[[
-# ------------------------------
-
-# .. envvar:: telegraf__dependent_upstream_enabled [[[
-#
-# Enable or disable installation of the :command:`telegraf` script from upstream
-# :command:`git` repository.
-telegraf__dependent_upstream_enabled: False
-
-                                                                   # ]]]
 # .. envvar:: telegraf__keyring__dependent_apt_keys [[[
 #
 # Configuration for the :ref:`debops.keyring` Ansible role.
@@ -99,17 +89,17 @@ telegraf__allow: [ '0.0.0.0/0' ]
 # configuration file.
 telegraf__default_configuration:
 
-  - name: 'global_tags'
-    options:
-      - dc: '"us-east-1"'
-        rack: '"1a"'
-        user: '"$USER"'
+# - name: 'global_tags'
+#   options:
+#    - dc: '"us-east-1"'
+#        rack: '"1a"'
+#        user: '"$USER"'
 
   - name: 'agent'
     options:
       - hostname: '"$hostname"'
-      - flush_interval: '"15s"'
-      - interval: '"15s"'
+        flush_interval: '"15s"'
+        interval: '"15s"'
 
   - name: inputs.cpu
     options:
@@ -121,13 +111,13 @@ telegraf__default_configuration:
   - name: inputs.disk
     options:
       - fielddrop: '[ "inodes" ]'
-      - mount_points: '[ "/" ]'
-      - ignore_fs: '[ "tmpfs", "devtmpfs", "devfs" ]'
+        mount_points: '[ "/" ]'
+        ignore_fs: '[ "tmpfs", "devtmpfs", "devfs" ]'
 
   - name: inputs.net
     options:
       - interfaces: '[ "eth0" ]'
-      - fielddrop: '[ "icmp*", "ip*", "tcp*", "udp*" ]'
+        fielddrop: '[ "icmp*", "ip*", "tcp*", "udp*" ]'
 
   # Get the number of processes and group them by status
   - name: inputs.processes
@@ -158,11 +148,7 @@ telegraf__default_configuration:
 
 
   - name: outputs.influxdb
-    options:
-       - database: '"bechea"'
-       - password: '"s3cr3t"'
-       - urls: '[ "http://192.168.3.227:8086" ]'
-       - username: '"john"'
+    options: []
 
                                                                    # ]]]
 # .. envvar:: telegraf__configuration [[[

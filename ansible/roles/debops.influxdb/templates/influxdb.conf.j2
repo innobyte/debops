@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 
 {% for element in influxdb__combined_configuration | parse_kv_items %}
 {%   if element.name|d() and element.state|d('present') not in [ 'absent', 'ignore' ] %}
@@ -16,20 +17,3 @@
 {%     endif %}
 {%   endif %}
 {% endfor %}
-
-#[meta]
-#[data]
-#[coordinator]
-#[retention]
-#[shard-precreation]
-#[monitor]
-#[http]
-#[logging]
-#[subscriber]
-#
-#[[graphite]]
-#[[collectd]]
-#[[opentsdb]]
-#[[udp]]
-#[continuous_queries]
-#[tls]

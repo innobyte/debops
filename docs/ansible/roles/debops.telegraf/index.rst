@@ -4,8 +4,7 @@ debops.telegraf
 ===============
 
 The ``debops.telegraf`` role can be used to install Telegraf on a Debian or
-Ubuntu host. Telegraf will be installed either from the OS repositories, from
-Telegraf upstream APT repository, or using a locally built ``.deb`` package.
+Ubuntu host. Telegraf will be installed from Telegraf upstream APT repository.
 
 .. toctree::
    :maxdepth: 2

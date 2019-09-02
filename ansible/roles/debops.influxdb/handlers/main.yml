@@ -5,8 +5,3 @@
     name: 'influxdb'
     state: 'restarted'
     enabled: yes
-
-# - name: Reload influxdb
-#   service:
-#     name: 'influxdb'
-#     state: 'reloaded'

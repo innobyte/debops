@@ -1,5 +1,7 @@
 # Global Agent Configuration
 
+# {{ ansible_managed }}
+
 {% for element in telegraf__combined_configuration | parse_kv_items %}
 {%   if element.name|d() and element.state|d('present') not in [ 'absent', 'ignore' ] %}
 
@@ -17,28 +19,3 @@
 {%     endif %}
 {%   endif %}
 {% endfor %}
-
-# Input Plugins
-# [[inputs.cpu]]
-#     percpu = true
-#     totalcpu = true
-#     collect_cpu_time = false
-#     report_active = false
-# [[inputs.disk]]
-#     ignore_fs = ["tmpfs", "devtmpfs", "devfs"]
-# [[inputs.io]]
-# [[inputs.mem]]
-# [[inputs.net]]
-# [[inputs.system]]
-# [[inputs.swap]]
-# [[inputs.netstat]]
-# [[inputs.processes]]
-# [[inputs.kernel]]
-
-
-# # Output Plugin InfluxDB
-# [[outputs.influxdb]]
-#   database = "bechea"
-#   urls = [ "http://127.0.0.1:8086" ]
-#   username = "john"
-#   password = "s3cr3t"

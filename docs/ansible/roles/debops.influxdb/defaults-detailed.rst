@@ -25,41 +25,9 @@ Each database is defined as a YAML dict with the following keys:
 ``hostname``
   The hostname or IP address on which InfluxDB server is listening. Since version 2.5, defaulted to ``localhost``.
 
-``password``
-  Password that will be used to authenticate against InfluxDB server. Alias ``login_password`` added in version 2.5, defaulted to ``localhost``.
-
-``port``
-  The port on which InfluxDB server is listening, defaulted to ``8086``.
-
-``proxies``
-  HTTP(S) proxy to use for Requests to connect to InfluxDB server added in version 2.5.
-
-``retries``
-  Number of retries client will try before aborting. ``0`` indicates try until success and it is defaulted to ``3``.
-
-``ssl``
-  Uses https instead of http to connect to InfluxDB server., added in 2.5.
-
 ``state``
   Optional. If value is ``present``, the database will be created; if ``absent``,
   the database will be removed. It is defaulted to ``present``.
-
-``timeout``
-  Number of seconds Requests will wait for client to establish a connection, added in ``2.5``.
-
-``udp_port``
-  UDP port to connect to InfluxDB server, defaulted to ``4444``.
-
-``use_udp``
-  Use UDP to connect to InfluxDB server.
-
-``username``
-  Username that will be used to authenticate against InfluxDB server.
-  Alias ``login_username`` added in version 2.5, defaulted to ``root``.
-
-``validate_certs``
-  If set to ``no``, the SSL certificates will not be validated.
-  This should only set to ``no`` used on personally controlled sites using self-signed certificates. It is defaulted to ``yes``.
 
 Examples
 ~~~~~~~~
@@ -70,7 +38,7 @@ Create databases, remove some of the existing ones:
 
    influxdb__databases:
 
-     - hostname: 'ip or hostname'
+     - hostname: 'ip or {{ influxdb__hostname }}'
        database_name: 'dbname'
 
 
@@ -90,7 +58,7 @@ User account parameters
 
 ``grants``
   Privileges to grant to this user. Takes a list of dicts containing the ``database`` and ``privilege`` keys.
-  If this argument is not provided, the current grants will be left alone. If an empty list is provided, all grants for the user will be removed.
+  If this argument is not provided, the current grants will be left alone. If an empty list is provided, all grants for the user will be removed. It is added in 2.8.
 
 ``hostname``
   The hostname or IP address on which InfluxDB server is listening.
@@ -100,30 +68,9 @@ User account parameters
   Password that will be used to authenticate against InfluxDB server.
   Alias ``login_password`` added in Ansible 2.5.
 
-``port``
-  The port on which InfluxDB server is listening, defaulted to ``8086``.
-
-``proxies``
-  HTTP(S) proxy to use for Requests to connect to InfluxDB server.
-
-``retries``
-  Number of retries client will try before aborting. ``0`` indicates try until success.
-
-``ssl``
-  Use https instead of http to connect to InfluxDB server.
-
 ``state``
   Optional. If value is ``present``, the user will be created; if ``absent``,
   the user will be removed. It is defaulted to ``present``.
-
-``timeout``
-  Number of seconds Requests will wait for client to establish a connection.
-
-``udp_port``
-  UDP port to connect to InfluxDB server.
-
-``use_udp``
-  Use UDP to connect to InfluxDB server.
 
 ``user_name``
   Name of the user, required.
@@ -134,10 +81,6 @@ User account parameters
 ``username``
   Username that will be used to authenticate against InfluxDB server.
   Alias ``login_username`` added in Ansible 2.5, defaulted to ``root``.
-
-``validate_certs``
-  If set to ``no``, the SSL certificates will not be validated.
-  This should only set to ``no`` used on personally controlled sites using self-signed certificates. It is defaulted to ``yes``.
 
 Examples
 ~~~~~~~~
@@ -157,9 +100,9 @@ Create a user on localhost using custom login credentials
    influxdb__users:
      - user_name: 'someuser'
        user_password: 'somepassword'
-       hostname: '192.168.3.203'
-       login_username: 'ceva'
-       login_password: 'altceva'
+       hostname: '{{ influxdb__hostname }}'
+       login_username: 'someuser1'
+       login_password: 'somepassword1'
 
 Create an admin user on a remote host using custom login credentials
 
@@ -169,9 +112,9 @@ Create an admin user on a remote host using custom login credentials
      - user_name: 'someuser'
        user_password: 'somepassword'
        admin: yes
-       hostname: '192.168.3.203'
-       login_username: 'ceva'
-       login_password: 'altceva'
+       hostname: '{{ influxdb__hostname }}'
+       login_username: 'someuser1'
+       login_password: 'somepassword1'
 
 Create a user on localhost with privileges
 
@@ -181,10 +124,9 @@ Create a user on localhost with privileges
      - user_name: 'someuser'
        user_password: 'somepassword'
        admin: yes
-       login_username: 'ceva'
-       login_password: 'altceva'
+       login_username: 'someuser1'
+       login_password: 'somepassword1'
        grants:
          - database: 'db'
            privilege: 'WRITE'
-         - database: 'db2'
-           privilege: 'READ'
+

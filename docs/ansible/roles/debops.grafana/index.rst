@@ -4,8 +4,7 @@ debops.grafana
 ==============
 
 The ``debops.grafana`` role can be used to install Grafana on a Debian or
-Ubuntu host. Grafana will be installed either from the OS repositories, from
-Grafana upstream APT repository, or using a locally built ``.deb`` package.
+Ubuntu host. Grafana will be installed from upstream APT repository.
 
 .. toctree::
    :maxdepth: 2
