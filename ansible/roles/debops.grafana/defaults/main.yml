@@ -67,7 +67,7 @@ grafana__allow: [ '0.0.0.0/0' ]
 # .. envvar:: grafana__port [[[
 #
 # Port number on which this Grafana listens on.
-grafana__port: '3000'
+grafana__port: '3001'
 
                                                                    # ]]]
 # Configuration for other Ansible roles [[[
