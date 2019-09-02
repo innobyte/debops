@@ -50,8 +50,6 @@
     hostname: '{{ item.hostname | d(item.name) }}'
     database_name: '{{ item.database_name }}'
     state: 'present'
-    encoding: '{{ item.encoding | d(omit) }}'
-    collation: '{{ item.collation | d(omit) }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
   when: ((item.database_name|d(False) or item.hostname|d(False)) and
          (item.state is undefined or item.state != 'absent'))

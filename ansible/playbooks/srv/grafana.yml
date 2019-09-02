@@ -15,6 +15,11 @@
       etc_services__dependent_list:
         - '{{ grafana__etc_services__dependent_list }}'
 
+    - role: debops.keyring
+      tags: [ 'role::keyring', 'skip::keyring', 'role::grafana' ]
+      keyring__dependent_apt_keys:
+        - '{{ grafana__keyring__dependent_apt_keys }}'
+
     - role: debops.grafana
       tags: [ 'role::grafana', 'skip::grafana' ]
 

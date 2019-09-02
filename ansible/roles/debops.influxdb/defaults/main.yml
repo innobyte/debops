@@ -29,16 +29,16 @@ influxdb__deploy_type: '{{ "upstream"
                             else "system" }}'
 
                                                                    # ]]]
-# .. envvar:: influxdb__upstream_apt_key [[[
+# .. envvar:: influxdb__upstream_apt_id [[[
 #
-# The InfluxDB key of the Influxdb upstream APT repository.
-influxdb__upstream_apt_key: 'https://repos.influxdata.com/influxdb.key'
+# The InfluxDB fingerprint.
+influxdb__upstream_apt_id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
 
                                                                    # ]]]
 # .. envvar:: influxdb__upstream_apt_repository [[[
 #
 # The URL of the Influxdb upstream :command:`git` repository.
-influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/ubuntu bionic stable'
+influxdb__upstream_apt_repository: 'deb https://repos.influxdata.com/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable'
 
                                                                    # ]]]
 # .. envvar:: influxdb__base_packages [[[
@@ -87,7 +87,16 @@ influxdb__host_packages: []
 influxdb__dependent_packages: []
                                                                    # ]]]
                                                                    # ]]]
-influxdb__dependent_upstream_enabled: False
+# .. envvar:: influxdb__keyring__dependent_apt_keys [[[
+#
+# Configuration for the :ref:`debops.keyring` Ansible role.
+influxdb__keyring__dependent_apt_keys:
+
+  - id: '{{ influxdb__upstream_apt_id }}'
+    repo: '{{ influxdb__upstream_apt_repository }}'
+    state: '{{ "present" if (influxdb__deploy_type == "upstream") else "absent" }}'
+                                                                   # ]]]
+                                                                   # ]]]
 # .. envvar:: influxdb__allow [[[
 #
 # List of IP addresses or CIDR subnets which will be allowed to connect to the
@@ -146,6 +155,18 @@ influxdb__dependent_users: []
 influxdb__default_privileges_grant: 'ALL'
 
                                                                    # ]]]
+# .. envvar:: influxdb__port_rpc [[[
+#
+# Port number on which this InfluxDB listens on.
+influxdb__port: '8086'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__port_rpc [[[
+#
+# Port number used by the RPC service for RPC calls made by the CLI for backup and restore operations .
+influxdb__port_rpc: '8088'
+
+                                                                   # ]]]
 # Configuration for other Ansible roles [[[
 # -----------------------------------------
 
@@ -155,14 +176,14 @@ influxdb__default_privileges_grant: 'ALL'
 influxdb__ferm__dependent_rules:
 
   - type: 'accept'
-    dport: [ '8086' ]
+    dport: [ 'influxdb' ]
     saddr: '{{ influxdb__allow }}'
     accept_any: False
     weight: '40'
     role: 'influxdb'
 
   - type: 'accept'
-    dport: [ '8088' ]
+    dport: [ 'influxdb-rpc' ]
     saddr: '{{ influxdb__allow }}'
     accept_any: False
     weight: '41'
@@ -170,15 +191,17 @@ influxdb__ferm__dependent_rules:
 
 
                                                                    # ]]]
-# .. envvar:: influxdb__keyring__dependent_apt_keys [[[
+# .. envvar:: influxdb__etc_services__dependent_list [[[
 #
-# Configuration for the :ref:`debops.keyring` Ansible role.
-influxdb__keyring__dependent_apt_keys:
+# Configuration for the :ref:`debops.etc_services` Ansible role.
+influxdb__etc_services__dependent_list:
 
-  - id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
-    repo: '{{ influxdb__upstream_apt_repository }}'
-    state: '{{ "present" if (influxdb__deploy_type == "upstream") else "absent" }}'
-                                                                   # ]]]
+  - name: 'influxdb'
+    port: '{{ influxdb__port }}'
+
+  - name: 'influxdb-rpc'
+    port: '{{ influxdb__port_rpc }}'
+
                                                                    # ]]]
 # .. envvar:: influxdb__python__dependent_packages2 [[[
 #
@@ -242,11 +265,11 @@ influxdb__default_configuration:
   - name: 'collectd'
     options: []
 
-  # - name: 'opentsdb'
-  #   options: []
+  - name: 'opentsdb'
+    options: []
 
-  # - name: 'udp'
-  #   options: []
+  - name: 'udp'
+    options: []
 
   - name: 'continuous_queries'
     options: []

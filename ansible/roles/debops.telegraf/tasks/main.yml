@@ -4,7 +4,6 @@
   package:
     name: '{{ item }}'
     state: 'present'
-    # update_cache: True
     force: yes
   with_flattened:
     - '{{ telegraf__base_packages }}'
