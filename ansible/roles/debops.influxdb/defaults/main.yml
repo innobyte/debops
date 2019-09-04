@@ -158,13 +158,13 @@ influxdb__default_privileges_grant: 'ALL'
 # .. envvar:: influxdb__port_rpc [[[
 #
 # Port number on which this InfluxDB listens on.
-influxdb__port: '8086'
+influxdb__port: '8082'
 
                                                                    # ]]]
 # .. envvar:: influxdb__port_rpc [[[
 #
 # Port number used by the RPC service for RPC calls made by the CLI for backup and restore operations .
-influxdb__port_rpc: '8088'
+influxdb__port_rpc: '8084'
 
                                                                    # ]]]
 # Configuration for other Ansible roles [[[
@@ -228,6 +228,10 @@ influxdb__python__dependent_packages3: []
 # configuration file.
 influxdb__default_configuration:
 
+  - name: 'global'
+    options:
+      - bind-address: '"127.0.0.1:8084"'
+
   - name: 'meta'
     options:
       - dir: '"/var/lib/influxdb/meta"'
@@ -251,7 +255,8 @@ influxdb__default_configuration:
     options: []
 
   - name: 'http'
-    options: []
+    options:
+      - bind-address: '":8082"'
 
   - name: 'logging'
     options: []
