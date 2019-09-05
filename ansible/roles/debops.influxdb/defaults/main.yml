@@ -155,7 +155,7 @@ influxdb__dependent_users: []
 influxdb__default_privileges_grant: 'ALL'
 
                                                                    # ]]]
-# .. envvar:: influxdb__port_rpc [[[
+# .. envvar:: influxdb__port [[[
 #
 # Port number on which this InfluxDB listens on.
 influxdb__port: '8082'
