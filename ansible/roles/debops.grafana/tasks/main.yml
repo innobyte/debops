@@ -21,6 +21,7 @@
     owner: 'root'
     group: 'adm'
     mode: '0644'
+  notify: [ 'Restart grafana' ]
 
 - name: Make sure that Ansible local facts directory exists
   file:

@@ -16,7 +16,7 @@
   pip:
     name: '{{ item }}'
     state: 'latest'
-  with_items: '{{ influxdb__pip_packages }}'
+  loop: '{{ influxdb__pip_packages }}'
   register: influxdb__register_pip_install
   until: influxdb__register_pip_install is succeeded
   when: influxdb__pip_packages|d()
@@ -33,6 +33,7 @@
     owner: 'root'
     group: 'adm'
     mode: '0644'
+  notify: [ 'Restart influxdb' ]
 
 - name: Drop database
   influxdb_database:

@@ -158,13 +158,13 @@ influxdb__default_privileges_grant: 'ALL'
 # .. envvar:: influxdb__port [[[
 #
 # Port number on which this InfluxDB listens on.
-influxdb__port: '8082'
+influxdb__port: '8086'
 
                                                                    # ]]]
 # .. envvar:: influxdb__port_rpc [[[
 #
 # Port number used by the RPC service for RPC calls made by the CLI for backup and restore operations .
-influxdb__port_rpc: '8084'
+influxdb__port_rpc: '8088'
 
                                                                    # ]]]
 # InfluxDB configuration file [[[
