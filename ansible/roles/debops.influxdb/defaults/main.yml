@@ -167,58 +167,6 @@ influxdb__port: '8082'
 influxdb__port_rpc: '8084'
 
                                                                    # ]]]
-<<<<<<< HEAD
-=======
-# Configuration for other Ansible roles [[[
-# -----------------------------------------
-
-# .. envvar:: influxdb__ferm__dependent_rules [[[
-#
-# Configuration for :ref:`debops.ferm` InfluxDB role.
-influxdb__ferm__dependent_rules:
-
-  - type: 'accept'
-    dport: [ 'influxdb' ]
-    saddr: '{{ influxdb__allow }}'
-    accept_any: False
-    weight: '40'
-    role: 'influxdb'
-
-  - type: 'accept'
-    dport: [ 'influxdb-rpc' ]
-    saddr: '{{ influxdb__allow }}'
-    accept_any: False
-    weight: '41'
-    role: 'influxdb'
-
-
-                                                                   # ]]]
-# .. envvar:: influxdb__etc_services__dependent_list [[[
-#
-# Configuration for the :ref:`debops.etc_services` Ansible role.
-influxdb__etc_services__dependent_list:
-
-  - name: 'influxdb'
-    port: '{{ influxdb__port }}'
-
-  - name: 'influxdb-rpc'
-    port: '{{ influxdb__port_rpc }}'
-
-                                                                   # ]]]
-# .. envvar:: influxdb__python__dependent_packages2 [[[
-#
-# Configuration for the :ref:`debops.python` Ansible role.
-influxdb__python__dependent_packages2: []
-
-                                                                   # ]]]
-# .. envvar:: influxdb__python__dependent_packages3 [[[
-#
-# Configuration for the :ref:`debops.python` Ansible role.
-influxdb__python__dependent_packages3: []
-
-                                                                   # ]]]
-                                                                   # ]]]
->>>>>>> 7aec19f2e5459d29f6d1f0266388869305a99a5a
 # InfluxDB configuration file [[[
 # ------------------------------------
 
