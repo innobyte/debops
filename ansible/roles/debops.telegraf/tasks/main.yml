@@ -2,14 +2,13 @@
 
 - name: Install Telegraf requested packages
   package:
-    name: '{{ item }}'
+    name: '{{ q("flattened", telegraf__base_packages
+                             + telegraf__packages) }}'
     state: 'present'
     force: yes
-  with_flattened:
-    - '{{ telegraf__base_packages }}'
-    - '{{ telegraf__packages }}'
-  register: telegraf__register_install
-  until: telegraf__register_install is succeeded
+  register: telegraf__register_packages
+  until: telegraf__register_packages is succeeded
+  notify: [ 'Restart telegraf' ]
 
 - name: Divert the original telegraf configuration file
   command: dpkg-divert --quiet --local --divert /etc/telegraf/telegraf.conf.dpkg-divert --rename /etc/telegraf/telegraf.conf

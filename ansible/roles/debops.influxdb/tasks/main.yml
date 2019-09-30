@@ -2,16 +2,14 @@
 
 - name: Install Influxdb requested packages
   package:
-    name: '{{ item }}'
+    name: '{{ q("flattened", influxdb__base_packages
+                             + influxdb__packages
+                             + influxdb__host_packages
+                             + influxdb__group_packages
+                             + influxdb__dependent_packages) }}'
     state: 'present'
-  with_flattened:
-    - '{{ influxdb__base_packages }}'
-    - '{{ influxdb__packages }}'
-    - '{{ influxdb__host_packages }}'
-    - '{{ influxdb__group_packages }}'
-    - '{{ influxdb__dependent_packages }}'
-  register: influxdb__register_install
-  until: influxdb__register_install is succeeded
+  register: influxdb__register_packages
+  until: influxdb__register_packages is succeeded
   notify: [ 'Restart influxdb' ]
 
 - name: Install required Python modules

@@ -18,9 +18,12 @@ galaxy_info:
         - trusty
         - utopic
         - vivid
+        - bionic
     - name: Debian
       versions:
         - jessie
         - wheezy
+        - bullseye
+        - buster
   galaxy_tags:
     - grafana

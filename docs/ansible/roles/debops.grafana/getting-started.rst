@@ -21,7 +21,7 @@ Example playbook
 ----------------
 
 If you are using this role without DebOps, here's an example Ansible playbook
-that uses the ``debops.grafana_server`` role:
+that uses the ``debops.grafana`` role:
 
 .. literalinclude:: ../../../../ansible/playbooks/service/grafana.yml
    :language: yaml

@@ -2,13 +2,11 @@
 
 - name: Install requested packages
   package:
-    name: '{{ item }}'
+    name: '{{ q("flattened", grafana__base_packages
+                             + grafana__packages) }}'
     state: 'present'
-  with_flattened:
-    - '{{ grafana__base_packages }}'
-    - '{{ grafana__packages }}'
-  register: grafana__register_install
-  until: grafana__register_install is succeeded
+  register: grafana__register_packages
+  until: grafana__register_packages is succeeded
   notify: [ 'Restart grafana' ]
 
 - name: Divert the original grafana configuration file

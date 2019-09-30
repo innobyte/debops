@@ -112,4 +112,4 @@ grafana__default_configuration:
 
   - name: 'server'
     options:
-      - http_port: '3001'
+      - http_port: '{{ grafana__port }}'

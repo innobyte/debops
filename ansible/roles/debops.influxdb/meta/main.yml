@@ -17,9 +17,12 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - xenial
+        - bionic
     - name: Debian
       versions:
         - jessie
         - stretch
+        - bullseye
+        - buster
   galaxy_tags:
     - influxdb
