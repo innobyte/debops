@@ -184,13 +184,22 @@ attribute as the UNIX group name, but it's usually a simple configuration
 change.
 
 
+.. _slapd__ref_ppolicy_schema:
+
+The ``ppolicy`` schema
+----------------------
+
+The ``ppolicy`` schema provides LDAP object and attribute definitions required
+by the :ref:`slapd__ref_ppolicy_overlay`.
+
+
 .. _slapd__ref_ldapns:
 
 The ``ldapns`` schema
 ---------------------
 
 The ``ldapns`` schema provides a set of LDAP objects and attributes that can be
-used for graular access control to services and hosts that use the LDAP
+used for granular access control to services and hosts that use the LDAP
 directory. The ``host`` attribute can be used to define a list of FQDN names,
 or hostnames to which a given user or application has access. The
 ``authorizedService`` attribute can contain a list of services accessible to an
@@ -232,3 +241,23 @@ to ensure service availability in case of an issue with connection to the LDAP
 service.
 
 Manual pages: :man:`sudoers.ldap(5)`
+
+.. _slapd__ref_eduperson:
+
+The ``eduPerson`` schema
+------------------------
+
+The ``eduPerson`` and ``eduOrg`` are Lightweight Directory Access Protocol
+(LDAP) schema designed to include widely-used person and organizational
+attributes in higher education. The ``eduPerson`` object class provides
+a common list of attributes and definitions, drawing on the existing standards
+in higher education. The schema were developed `by the Internet2 project`__ and
+are commonly used in academic institutions.
+
+.. __: https://www.internet2.edu/products-services/trust-identity/eduperson-eduorg/
+
+The schema is available in Debian in the
+``fusiondirectory-plugin-supann-schema`` APT package, however that version is
+slightly outdated and does not include object and attribute descriptions.
+Because of that, DebOps contains its own copy of the schema, cleaned up and
+updated, which will be imported by default to OpenLDAP directory server.

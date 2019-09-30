@@ -48,11 +48,15 @@ Directory structure
 
         - :ref:`posixgroupid.schema <slapd__ref_posixgroupid>`
 
-        - :ref:`openssh-lpk.schema <slapd__ref_openssh_lpk>`
+        - :ref:`ppolicy.schema <slapd__ref_ppolicy_schema>`
 
         - :ref:`ldapns.schema <slapd__ref_ldapns>`
 
+        - :ref:`openssh-lpk.schema <slapd__ref_openssh_lpk>`
+
         - :ref:`sudo.schema <slapd__ref_sudo>`
+
+        - :ref:`eduperson.schema <slapd__ref_eduperson>`
 
       - ``olcDatabase={0}config``
 

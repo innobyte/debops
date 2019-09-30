@@ -34,6 +34,21 @@ General
     development; production code should be put in the :file:`ansible/roles/`
     and the :file:`ansible/playbooks/` directories respectively.
 
+- The :command:`debops-init` script now also creates the .gitattributes file
+  for use with :command:`git-crypt`. It is commented out by default.
+
+- The :command:`debops-defaults` command will check what pagers
+  (:command:`view`, :command:`less`, :command:`more`) are available and use the
+  best one automatically.
+
+LDAP
+''''
+
+- The :file:`ldap/init-directory.yml` Ansible playbook will create the LDAP
+  obejects ``cn=LDAP Replicators`` and ``cn=Password Reset Agents`` to allow
+  other Ansible roles to utilize them without the need for the system
+  administrator to define them by hand.
+
 :ref:`debops.apt_install` role
 ''''''''''''''''''''''''''''''
 
@@ -42,8 +57,134 @@ General
 
   .. __: https://github.com/vmware/open-vm-tools
 
+:ref:`debops.dnsmasq` role
+''''''''''''''''''''''''''
+
+- The role will tell the client applications to `disable DNS-over-HTTPS
+  support`__ using the ``use-application-dns.net`` DNS record. This should
+  allow connections to internal sites and preserve the split-DNS functionality.
+
+  .. __: https://support.mozilla.org/en-US/kb/canary-domain-use-application-dnsnet
+
+:ref:`debops.saslauthd` role
+''''''''''''''''''''''''''''
+
+- The role can now be used to authenticate users of different services against
+  the LDAP directory via integration with the :ref:`debops.ldap` role and its
+  framework. Multiple LDAP profiles can be used to provide different access
+  control for different services.
+
+:ref:`debops.slapd` role
+''''''''''''''''''''''''
+
+- Add support for :ref:`eduPerson LDAP schema <slapd__ref_eduperson>` with
+  updated schema file included in the role.
+
+- The role will configure SASL authentication in the OpenLDAP service using the
+  :ref:`debops.saslauthd` Ansible role. Both humans and machines can
+  authenticate to the OpenLDAP directory using their respective LDAP objects.
+
+:ref:`debops.unbound` role
+''''''''''''''''''''''''''
+
+- The role will tell the client applications to `disable DNS-over-HTTPS
+  support`__ using the ``use-application-dns.net`` DNS record. This should
+  allow connections to internal sites and preserve the split-DNS functionality.
+
+  .. __: https://support.mozilla.org/en-US/kb/canary-domain-use-application-dnsnet
+
 Changed
 ~~~~~~~
+
+Updates of upstream application versions
+''''''''''''''''''''''''''''''''''''''''
+
+- In the :ref:`debops.gitlab` role, GitLab version has been updated to
+  ``12.2``. This is the last release that supports Ruby 2.5 which is included
+  in Debian Buster.
+
+- In the :ref:`debops.ipxe` role, the Debian Stretch and Debian Buster netboot
+  installer versions have been updated to their next point releases, 9.10 and
+  10.1 respectively.
+
+- In the :ref:`debops.netbox` role, the NetBox version has been updated to
+  ``v2.6.3``.
+
+General
+'''''''
+
+- External commands used in the DebOps scripts have been defined as constants
+  to allow easier changes of the command location in various operating systems,
+  for example Guix.
+
+:ref:`debops.apt_preferences` role
+''''''''''''''''''''''''''''''''''
+
+- Support Debian Buster in :ref:`apt_preferences__list`.
+
+:ref:`debops.gitlab` role
+'''''''''''''''''''''''''
+
+- The LDAP support in GitLab has been converted to use the
+  :ref:`debops.ldap` infrastructure and not configure LDAP objects directly.
+  LDAP support in GitLab will be enabled automatically if it's enabled on
+  the host. Some of the configuration variables have been changed; see the
+  :ref:`upgrade_notes` for more details.
+
+- The default LDAP filter configured in the
+  :envvar:`gitlab__ldap_user_filter` variable has been modified to limit
+  access to the service to objects with specific attributes. See the
+  :ref:`GitLab LDAP access control <gitlab__ref_ldap_dit_access>`
+  documentation page for details about the required attributes and their
+  values.
+
+:ref:`debops.golang` role
+'''''''''''''''''''''''''
+
+- The role has been redesigned from the ground up, and can be used to install
+  Go applications either from APT packages, build them from source, or download
+  precompiled binaries from remote resources. See the role documentation for
+  more details.
+
+:ref:`debops.owncloud` role
+'''''''''''''''''''''''''''
+
+- Drop Nextcloud 14 support because it is EOL. You need to upgrade Nextcloud
+  manually if you are running 14 or below. Add Nextcloud 16 support. Now
+  default to Nextcloud 15 for new installations.
+
+- The LDAP support in Nextcloud has been converted to use the
+  :ref:`debops.ldap` infrastructure and not configure LDAP objects directly.
+  LDAP support in Nextcloud will be enabled automatically if it's enabled on
+  the host. Some of the configuration variables have been changed; see the
+  :ref:`upgrade_notes` for more details.
+
+- The default LDAP filter configured in the
+  :envvar:`owncloud__ldap_login_filter` variable has been modified to limit
+  access to the service to objects with specific attributes. See the
+  :ref:`Nextcloud LDAP access control <owncloud__ref_ldap_dit_access>`
+  documentation page for details about the required attributes and their
+  values.
+
+:ref:`debops.resolvconf` role
+'''''''''''''''''''''''''''''
+
+- The role will install and configure :command:`resolvconf` APT package only on
+  hosts with more than one network interface (not counting ``lo``), or if local
+  DNS services are also present on the host.
+
+:ref:`debops.slapd` role
+''''''''''''''''''''''''
+
+- Enable substring index for the ``sudoUser`` attribute from the :ref:`sudo
+  LDAP schema <slapd__ref_sudo>`. Existing installations should be updated
+  manually via the LDAP client, by setting the value of the ``sudoUser`` index
+  to ``eq,sub``.
+
+- Add indexes for the ``authorizedService`` and ``host`` attributes from the
+  :ref:`ldapns LDAP schema <slapd__ref_ldapns>` and the ``gid`` attribute from
+  the :ref:`posixGroupId LDAP schema <slapd__ref_posixgroupid>`. This should
+  improve performance in UNIX environments connected to the LDAP directory.
 
 :ref:`debops.sshd` role
 '''''''''''''''''''''''
@@ -56,8 +197,32 @@ Changed
 - The role will use Ansible local facts to check if OpenSSH server package is
   installed to conditionally enable/disable its start on first install.
 
+Removed
+~~~~~~~
+
+:ref:`debops.nginx` role
+''''''''''''''''''''''''
+
+- Set `nginx_upstream_php5_www_data` to absent. If you are still using
+  that Nginx upstream which was enabled by default then update your Ansible
+  role and switch to a supported PHP release.
+
 Fixed
 ~~~~~
+
+:ref:`debops.dnsmasq` role
+''''''''''''''''''''''''''
+
+- On Ubuntu hosts, the role will fix the configuration installed by the
+  :command:`lxd` package to use ``bind-dynamic`` option instead of
+  ``bind-interfaces``. This allows the :command:`dnsmasq` service to start
+  correctly.
+
+:ref:`debops.ferm` role
+'''''''''''''''''''''''
+
+- The ``dmz`` firewall configuration will use the ``dport`` parameter instead
+  of ``port``, otherwise filtering rules will not work as expected.
 
 :ref:`debops.nfs_server` role
 '''''''''''''''''''''''''''''
@@ -241,7 +406,7 @@ Updates of upstream application versions
   the :envvar:`nodejs__yarn_upstream` variable.
 
   If the NodeJS upstream support is enabled, the NodeJS 8.x version will be
-  installed on older Debian/Ubuntu releases, for exaple Debian Stretch and
+  installed on older Debian/Ubuntu releases, for example Debian Stretch and
   Ubuntu Bionic. Debian Buster and newer releases will use NodeJS 10.x
   version, to keep the Node version from upstream in sync with the one
   available in the OS repositories.
@@ -966,7 +1131,7 @@ Mail Transport Agents
 
 - If automatic reboots are enabled, VMs will not reboot all at the same time to
   avoid high load on the hypervisor host.  Instead they will reboot at
-  a particular minute in a 15 minute time window.  For each host, a random but
+  a particular minute in a 15 minute time window.  For each host, a
   random-but-idempotent time is chosen.  For hypervisor hosts good presets
   cannot be picked. You should ensure that hosts don’t reboot at the same time
   by defining different reboot times in inventory groups.

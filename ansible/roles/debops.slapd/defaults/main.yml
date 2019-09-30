@@ -62,6 +62,9 @@ slapd__default_schemas:
   # Support for 'sudo' rules in LDAP directory
   - '/etc/ldap/schema/fusiondirectory/sudo.schema'
 
+  # Support for 'eduPerson' and 'eduOrg' schema, included in DebOps
+  - '{{ slapd__debops_schema_path + "/eduperson.schema" }}'
+
                                                                    # ]]]
 # .. envvar:: slapd__schemas [[[
 #
@@ -545,7 +548,7 @@ slapd__default_tasks:
     dn: 'cn=config'
     attributes:
       olcTLSDHParamFile: '{{ slapd__dhparam_file }}'
-    state: '{{ "exact" if slapd__dhparam_file|d() else "init" }}'
+    state: '{{ "exact" if (slapd__pki|bool and slapd__dhparam_file|d()) else "init" }}'
 
   - name: 'Configure TLS cipher suites'
     dn: 'cn=config'
@@ -559,6 +562,21 @@ slapd__default_tasks:
       olcLocalSSF: '128'
       olcSecurity: 'ssf=128 update_ssf=128 simple_bind=128'
     state: '{{ "exact" if slapd__pki|bool else "init" }}'
+
+  - name: 'Configure supported SASL authentication methods'
+    dn: 'cn=config'
+    attributes:
+      olcSaslSecProps: 'noanonymous,minssf={{ "128" if slapd__pki|bool else "0" }}'
+    state: 'exact'
+
+    # Warning: changes in this attribute require slapd restart
+  - name: 'Define SASL regex matching rules'
+    dn: 'cn=config'
+    attributes:
+      olcAuthzRegexp:
+        - '{0}uid=([^,]*),cn=[^,]*,cn=auth uid=$1,ou=People,{{ slapd__basedn }}'
+        - '{1}uid=([^,]*),cn=([^,]*),cn=[^,]*,cn=auth ldap:///ou=Hosts,{{ slapd__basedn }}??sub?(&(objectClass=account)(uid=$1)(host=$2))'
+    state: 'exact'
 
   - name: 'Define the maximum size of the main database'
     dn: [ 'olcDatabase={1}mdb', 'cn=config' ]
@@ -579,7 +597,10 @@ slapd__default_tasks:
         - 'homeDirectory,loginShell eq'
         - 'uidNumber,gidNumber eq'
         - 'entryCSN,entryUUID eq'
-        - 'sudoUser eq'
+        - 'sudoUser eq,sub'
+        - 'authorizedService eq'
+        - 'host eq'
+        - 'gid eq'
 
   - name: 'Enable the monitor database'
     dn: 'olcDatabase={2}monitor,cn=config'
@@ -915,5 +936,24 @@ slapd__tcpwrappers__dependent_allow:
     weight: '50'
     filename: 'slapd_dependent_allow'
     comment: 'Allow connections to OpenLDAP service'
+
+                                                                   # ]]]
+# .. envvar:: slapd__saslauthd__dependent_instances [[[
+#
+# Configuration for the :ref:`debops.saslauthd` Ansible role.
+slapd__saslauthd__dependent_instances:
+
+  - name: 'slapd'
+    group: '{{ slapd__group }}'
+    description: 'OpenLDAP SASL Authentication Daemon'
+    config_path: '/etc/ldap/sasl2/slapd.conf'
+    config_group: '{{ slapd__group }}'
+    config_raw: |
+      pwcheck_method: saslauthd
+      mech_list: PLAIN LOGIN EXTERNAL
+      saslauthd_path: /var/lib/slapd/saslauthd/mux
+    socket_path: '/var/lib/slapd/saslauthd'
+    socket_group: '{{ slapd__group }}'
+    ldap_profile: 'slapd'
                                                                    # ]]]
                                                                    # ]]]
