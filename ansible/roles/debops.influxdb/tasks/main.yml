@@ -37,20 +37,20 @@
 
 - name: Drop database
   influxdb_database:
-    hostname: '{{ item.hostname | d(item.name) }}'
-    database_name: '{{ item.database_name }}'
+    hostname: '{{ item.hostname | d("localhost") }}'
+    database_name: '{{ item.database_name | d(item.name) }}'
     state: 'absent'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(False) or item.hostname|d(False)) and
+  when: ((item.database_name|d(item.name) or item.hostname|d("localhost")) and
          (item.state is defined and item.state == 'absent'))
 
 - name: Create database
   influxdb_database:
-    hostname: '{{ item.hostname | d(item.name) }}'
-    database_name: '{{ item.database_name }}'
+    hostname: '{{ item.hostname | d("localhost") }}'
+    database_name: '{{ item.database_name | d(item.name) }}'
     state: 'present'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(False) or item.hostname|d(False)) and
+  when: ((item.database_name|d(item.name) or item.hostname|d("localhost")) and
          (item.state is undefined or item.state != 'absent'))
   register: influxdb__register_database_status
 
