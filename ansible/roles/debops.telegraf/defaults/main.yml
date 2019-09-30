@@ -97,7 +97,7 @@ telegraf__default_configuration:
 
   - name: 'agent'
     options:
-      - hostname: '"$hostname"'
+      - hostname: '""'
         flush_interval: '"15s"'
         interval: '"15s"'
 
