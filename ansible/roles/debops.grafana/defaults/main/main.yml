@@ -105,11 +105,12 @@ grafana__keyring__dependent_apt_keys:
     state: '{{ "present" if (grafana__deploy_type == "upstream") else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]
-# grafana__original_configuration: []
-grafana__combined_configuration: '{{ grafana__default_configuration + grafana__original_configuration }}'
+grafana__configuration: []
 
 grafana__default_configuration:
 
   - name: 'server'
     options:
       - http_port: '{{ grafana__port }}'
+
+grafana__combined_configuration: '{{ grafana__default_configuration + grafana__configuration }}'
