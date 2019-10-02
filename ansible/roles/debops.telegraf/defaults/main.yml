@@ -110,9 +110,7 @@ telegraf__default_configuration:
 
   - name: inputs.disk
     options:
-      - fielddrop: '[ "inodes" ]'
-        mount_points: '[ "/" ]'
-        ignore_fs: '[ "tmpfs", "devtmpfs", "devfs" ]'
+      - ignore_fs: '[ "tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs" ]'
 
   - name: inputs.net
     options:
