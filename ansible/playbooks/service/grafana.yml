@@ -20,6 +20,14 @@
       keyring__dependent_apt_keys:
         - '{{ grafana__keyring__dependent_apt_keys }}'
 
+    - role: debops.nginx
+      tags: [ 'role::nginx', 'skip::nginx' ]
+      nginx__dependent_upstreams:
+        - '{{ grafana__nginx__dependent_upstreams }}'
+      nginx__dependent_servers:
+        - '{{ grafana__nginx__dependent_servers }}'
+      when: grafana__nginx_enabled|bool
+
     - role: debops.grafana
       tags: [ 'role::grafana', 'skip::grafana' ]
 
@@ -27,3 +35,4 @@
       tags: [ 'role::ferm', 'skip::ferm' ]
       ferm__dependent_rules:
         - '{{ grafana__ferm__dependent_rules }}'
+        - '{{ nginx__ferm__dependent_rules if (grafana__nginx_enabled|bool) else [] }}'
