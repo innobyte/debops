@@ -112,6 +112,7 @@ grafana__default_configuration:
   - name: 'server'
     options:
       - http_port: '{{ grafana__port }}'
+        domain: '{{ grafana__fqdn }}'
 
                                                                    # ]]]
 # .. envvar:: grafana__configuration [[[
