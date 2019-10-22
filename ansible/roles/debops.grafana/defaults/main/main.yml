@@ -18,7 +18,7 @@
 # String or list of the Fully Qualified domain names on which the Grafana
 # application will be available, used by the webserver. The first item will be
 # used as the e-mail sender domain name.
-grafana__fqdn: [ 'grafana.{{ grafana__domain }}' ]
+grafana__fqdn: 'grafana.{{ grafana__domain }}'
 
                                                                    # ]]]
 # .. envvar:: grafana__domain [[[
@@ -113,6 +113,8 @@ grafana__default_configuration:
     options:
       - http_port: '{{ grafana__port }}'
         domain: '{{ grafana__fqdn }}'
+        # TODO find a way to manage this
+        #root_url: '{{ "http://%(domain)s" }} '
 
                                                                    # ]]]
 # .. envvar:: grafana__configuration [[[
@@ -178,7 +180,7 @@ grafana__nginx__dependent_upstreams:
 #
 # Server configuration for the :ref:`debops.nginx` Ansible role.
 grafana__nginx__dependent_servers:
-  - name: '{{ grafana__fqdn }}'
+  - name: ['{{ grafana__fqdn }}']
     by_role: 'debops.grafana'
     filename: 'debops.grafana'
     location:
