@@ -15,6 +15,14 @@
   args:
     creates: '/etc/telegraf/telegraf.conf.dpkg-divert'
 
+- name: Allow 'telegraf' user access to /proc if needed
+  user:
+    name: 'telegraf'
+    groups: '{{ telegraf__proc_hidepid_group }}'
+    append: True
+  when: telegraf__proc_hidepid | bool
+  notify: [ 'Restart telegraf' ]
+
 - name: Configure main telegraf config file
   template:
     src: 'telegraf.conf.j2'
