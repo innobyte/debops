@@ -97,6 +97,7 @@ grafana__allow: [ '0.0.0.0/0' ]
 grafana__port: '3001'
 
                                                                    # ]]]
+                                                                   # ]]]
 # Grafana configuration file [[[
 # --------------------------------
 
@@ -162,7 +163,7 @@ grafana__keyring__dependent_apt_keys:
   - id: '{{ grafana__upstream_apt_id }}'
     repo: '{{ grafana__upstream_apt_repository }}'
     state: '{{ "present" if (grafana__deploy_type == "upstream") else "absent" }}'
-                                                                   # ]]]
+
                                                                    # ]]]
 # .. envvar:: grafana__nginx__dependent_upstreams [[[
 #

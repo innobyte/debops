@@ -135,7 +135,7 @@ influxdb__databases: []
 influxdb__dependent_databases: []
 
                                                                    # ]]]
-# .. envvar:: mariadb__users [[[
+# .. envvar:: influxdb__users [[[
 #
 # List of user accounts configured on the InfluxDB server. See
 # :ref:`influxdb_user` for more details.
@@ -149,6 +149,9 @@ influxdb__users: []
 influxdb__dependent_users: []
 
                                                                    # ]]]
+influxdb__admin_users: []
+influxdb__admin_dependent_users: []
+influxdb__default_admin_users: []
 # .. envvar:: influxdb__default_privileges_grant [[[
 #
 # Default privileges granted automatically.
@@ -208,6 +211,7 @@ influxdb__default_configuration:
   - name: 'http'
     options:
       - bind-address: '":{{ influxdb__port }}"'
+      - https-enabled: 'true'
 
   - name: 'logging'
     options: []
@@ -245,7 +249,7 @@ influxdb__configuration: []
 # Actual list of InfluxDB configuration options passed to the
 # configuration template. This list defines the order in which the options from
 # different variables are processed.
-influxdb__combined_configuration: '{{ influxdb__default_configuration + influxdb__configuration }}'
+influxdb__combined_configuration: '{{ influxdb__default_configuration + influxdb__configuration + influxdb__pki_options }}'
 
                                                                    # ]]]
 # Configuration for other Ansible roles [[[
@@ -296,4 +300,71 @@ influxdb__python__dependent_packages2: []
 influxdb__python__dependent_packages3: []
 
                                                                    # ]]]
+                                                                   # ]]]
+# SSL configuration [[[
+# ---------------------
+
+# .. envvar:: influxdb__append_groups [[[
+#
+# List of additional system groups to append to the InfluxDB system user.
+# ``ssl-cert`` group is required for access to certificate private keys.
+influxdb__append_groups: [ 'ssl-cert' ]
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki_options [[[
+#
+# Configuration of SSL support in :program:`influxdb`, managed by :ref:`debops.pki` role.
+influxdb__pki_options:
+  - name: 'http'
+    state: '{{ "present" if influxdb__pki|bool else "absent" }}'
+    options:
+      - 'https-certificate':   '"{{ influxdb__pki_path + "/" + influxdb__pki_realm + "/" + influxdb__pki_crt }}"'
+        'https-private-key':    '"{{ influxdb__pki_path + "/" + influxdb__pki_realm + "/" + influxdb__pki_key }}"'
+
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki [[[
+#
+# Enable or disable support for SSL in InfluxDB (using :ref:`debops.pki`).
+influxdb__pki: '{{ (True
+                      if (ansible_local|d() and ansible_local.pki|d() and
+                          ansible_local.pki.enabled|d() and
+                          influxdb__pki_realm in ansible_local.pki.known_realms)
+                      else False) | bool }}'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki_path [[[
+#
+# Base path for PKI directory.
+influxdb__pki_path: '{{ (ansible_local.pki.base_path
+                           if (ansible_local|d() and ansible_local.pki|d() and
+                               ansible_local.pki.base_path|d())
+                           else "/etc/pki") }}'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki_realm [[[
+#
+# Default PKI realm used by InfluxDB.
+influxdb__pki_realm: '{{ ansible_local.pki.realm
+                               if (ansible_local|d() and ansible_local.pki|d() and
+                                   ansible_local.pki.realm|d())
+                               else "realms" }}'
+                                                                   # ]]]
+# # .. envvar:: influxdb__pki_ca [[[
+# #
+# # Root CA certificate used by InfluxDB, relative to :envvar:`influxdb__pki_realm`.
+# influxdb__pki_ca: 'CA.crt'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki_crt [[[
+#
+# Host certificate used by InfluxDB, relative to :envvar:`influxdb__pki_realm`.
+influxdb__pki_crt: 'default.crt'
+
+                                                                   # ]]]
+# .. envvar:: influxdb__pki_key [[[
+#
+# Host private key used by InfluxDB, relative to :envvar:`influxdb__pki_realm`.
+influxdb__pki_key: 'private/key.pem'
+
                                                                    # ]]]

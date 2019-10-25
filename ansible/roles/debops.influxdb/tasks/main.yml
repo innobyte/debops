@@ -35,13 +35,39 @@
     mode: '0644'
   notify: [ 'Restart influxdb' ]
 
+- name: Add database server user to specified groups
+  user:
+    name: 'influxdb'
+    groups: '{{ influxdb__append_groups | join(",") | default(omit) }}'
+    append: True
+    createhome: False
+  when: influxdb__pki|bool
+
+- name: Create admin user
+  influxdb_user:
+    user_name: '{{ item.user_name | d(item.name) }}'
+    user_password: '{{ item.user_password | default(lookup("password",
+                  secret + "/influxdb/" +
+                  "/credentials/" + item.user_name | d(False) + "/password " +
+                  "length=" + influxdb__password_length)) }}'
+    admin: '{{ item.admin | d(omit) }}'
+    grants: '{{ item.grants | d(omit) }}'
+    hostname: '{{ item.hostname | default(influxdb__hostname) }}'
+    state: 'present'
+  with_flattened: '{{ influxdb__admin_users + influxdb__admin_dependent_users + influxdb__default_admin_users }}'
+  register: influxdb__register_create_users
+  when: ((item.user_name|d(False) or item.user_password|d(False)) and
+         (item.state is undefined or item.state != "absent"))
+
 - name: Drop database
   influxdb_database:
     hostname: '{{ item.hostname | d("localhost") }}'
     database_name: '{{ item.database_name | d(item.name) }}'
     state: 'absent'
+    login_username: '{{ item.login_username | d(omit) }}'
+    login_password: '{{ item.login_password | d(omit) }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(item.name) or item.hostname|d("localhost")) and
+  when: ((item.database_name|d(item.name) or item.hostname|d("localhost") or item.login_username|d(False) or item.login_password|d(False)) and
          (item.state is defined and item.state == 'absent'))
 
 - name: Create database
@@ -49,15 +75,17 @@
     hostname: '{{ item.hostname | d("localhost") }}'
     database_name: '{{ item.database_name | d(item.name) }}'
     state: 'present'
+    login_username: '{{ item.login_username | d(omit) }}'
+    login_password: '{{ item.login_password | d(omit) }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(item.name) or item.hostname|d("localhost")) and
+  when: ((item.database_name|d(item.name) or item.hostname|d("localhost") or item.login_username|d(False) or item.login_password|d(False)) and
          (item.state is undefined or item.state != 'absent'))
   register: influxdb__register_database_status
 
 - name: Drop user
   influxdb_user:
     user_name: '{{ item.user_name | d(item.name) }}'
-    # user_password: '{{ item.user_password }}'
+    user_password: '{{ item.user_password }}'
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     state: 'absent'
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
@@ -71,7 +99,6 @@
                   secret + "/influxdb/" +
                   "/credentials/" + item.user_name | d(False) + "/password " +
                   "length=" + influxdb__password_length)) }}'
-    # admin: '{{ item.admin | d(omit) }}'
     grants: '{{ item.grants | d(omit) }}'
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     login_username: '{{ item.login_username | d(omit) }}'
