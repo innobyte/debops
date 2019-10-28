@@ -130,3 +130,112 @@ Create a user on localhost with privileges
          - database: 'db'
            privilege: 'WRITE'
 
+influxdb__default_configuration
+-------------------------------
+
+Controls how the HTTP endpoints are configured. These are the primary
+mechanism for getting data into and out of InfluxDB.
+
+.. code-block:: yaml
+
+   influxdb__default_configuration:
+   options:
+     - bind-address: '":{{ influxdb__port }}"'
+     - https-enabled: 'true'
+     - auth-enabled: 'true'
+
+
+``name``
+    Required. This parameter defines the option name, and it needs to be unique in a given configuration file
+
+  ``options``
+      Optional. A YAML list of :command:`influxdb` configuration options defined in the configuration file.
+
+      Each element of the options list is a YAML dictionary with specific parameters:
+
+      ``auth-enabled``
+        Determines whether user authentication is enabled over HTTP/HTTPS.
+
+      ``bind-address``
+        The bind address used by the HTTP service.
+
+      ``https-certificate``
+        The SSL certificate to use when HTTPS is enabled.
+
+      ``https-private-key``
+        Use a separate private key location.
+
+      ``https-enabled``
+        Determines whether HTTPS is enabled.
+
+      ``dir``
+        The directory where the TSM storage engine stores TSM files.
+
+      ``wal-dir``
+        The directory where the TSM storage engine stores WAL files.
+
+      ``series-id-set-cache-size``
+        The size of the internal cache used in the TSI index to store previously
+        calculated series results. Cached results will be returned quickly from the
+        cache rather than needing to be recalculated when a subsequent query with a
+        matching tag key-value predicate is executed. Setting this value to ``0`` will
+        disable the cache, which may lead to query performance issues. This value
+        should only be increased if it is known that the set of regularly
+Examples
+~~~~~~~~
+
+- name: 'global'
+    options:
+      - bind-address: '"127.0.0.1:{{ influxdb__port_rpc }}"'
+
+  - name: 'meta'
+    options:
+      - dir: '"/var/lib/influxdb/meta"'
+
+  - name: 'data'
+    options:
+      - dir: '"/var/lib/influxdb/data"'
+      - wal-dir: '"/var/lib/influxdb/wal"'
+      - series-id-set-cache-size: '100'
+
+  - name: 'coordinator'
+    options: []
+
+  - name: 'retention'
+    options: []
+
+  - name: 'shard-precreation'
+    options: []
+
+  - name: 'monitor'
+    options: []
+
+  - name: 'http'
+    options:
+      - bind-address: '":{{ influxdb__port }}"'
+      - https-enabled: 'true'
+      - auth-enabled: 'true'
+
+  - name: 'logging'
+    options: []
+
+  - name: 'subscriber'
+    options: []
+
+  - name: 'graphite'
+    options: []
+
+  - name: 'collectd'
+    options: []
+
+  - name: 'opentsdb'
+    options: []
+
+  - name: 'udp'
+    options: []
+
+  - name: 'continuous_queries'
+    options: []
+
+  - name: 'tls'
+    options: []

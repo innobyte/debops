@@ -50,13 +50,16 @@
                   secret + "/influxdb/" +
                   "/credentials/" + item.user_name | d(False) + "/password " +
                   "length=" + influxdb__password_length)) }}'
+    login_username: '{{ item.login_username | d(omit) }}'
+    login_password: '{{ item.login_password | d(omit) }}'
+    ssl: true
     admin: '{{ item.admin | d(omit) }}'
     grants: '{{ item.grants | d(omit) }}'
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     state: 'present'
   with_flattened: '{{ influxdb__admin_users + influxdb__admin_dependent_users + influxdb__default_admin_users }}'
   register: influxdb__register_create_users
-  when: ((item.user_name|d(False) or item.user_password|d(False)) and
+  when: ((item.user_name|d(False) or item.user_password|d(False) or login_password|d(False) or item.login_password|d(False)) and
          (item.state is undefined or item.state != "absent"))
 
 - name: Drop database
@@ -64,6 +67,7 @@
     hostname: '{{ item.hostname | d("localhost") }}'
     database_name: '{{ item.database_name | d(item.name) }}'
     state: 'absent'
+    ssl: true
     login_username: '{{ item.login_username | d(omit) }}'
     login_password: '{{ item.login_password | d(omit) }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
@@ -88,6 +92,7 @@
     user_password: '{{ item.user_password }}'
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     state: 'absent'
+    ssl: true
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   when: ((item.user_name|d(False)) and
          (item.state is defined and item.state == "absent"))
@@ -100,6 +105,7 @@
                   "/credentials/" + item.user_name | d(False) + "/password " +
                   "length=" + influxdb__password_length)) }}'
     grants: '{{ item.grants | d(omit) }}'
+    ssl: true
     hostname: '{{ item.hostname | default(influxdb__hostname) }}'
     login_username: '{{ item.login_username | d(omit) }}'
     login_password: '{{ item.login_password | d(omit) }}'
