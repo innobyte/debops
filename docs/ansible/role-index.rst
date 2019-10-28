@@ -35,6 +35,7 @@ etc.
 - :ref:`debops.roundcube`
 - :ref:`debops.rstudio_server`
 - :ref:`debops.phpipam`
+- :ref:`debops.grafana`
 - ``debops.phpmyadmin``
 - ``debops-contrib.foodsoft``
 - ``debops-contrib.homeassistant``
