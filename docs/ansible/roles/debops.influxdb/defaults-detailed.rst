@@ -23,7 +23,7 @@ Each database is defined as a YAML dict with the following keys:
   80 for MariaDB databases.
 
 ``hostname``
-  The hostname or IP address on which InfluxDB server is listening. Since version 2.5, defaulted to ``localhost``.
+  The hostname or IP address on which InfluxDB server is listening. Defaulted to ``influxdb__fqdn``.
 
 ``state``
   Optional. If value is ``present``, the database will be created; if ``absent``,
@@ -38,8 +38,7 @@ Create databases, remove some of the existing ones:
 
    influxdb__databases:
 
-     - hostname: 'ip or {{ influxdb__hostname }}'
-       database_name: 'dbname'
+     - database_name: 'dbname'
 
 
 .. _influxdb_user:
@@ -85,7 +84,7 @@ User account parameters
 Examples
 ~~~~~~~~
 
-Create a user on localhost using default login credentials
+Create an user on localhost using default login credentials
 
 .. code-block:: yaml
 
@@ -93,42 +92,16 @@ Create a user on localhost using default login credentials
      - user_name: 'someuser'
        user_password: 'somepassword'
 
-Create a user on localhost using custom login credentials
+Create an user on remote host
 
 .. code-block:: yaml
 
-   influxdb__users:
-     - user_name: 'someuser'
-       user_password: 'somepassword'
-       hostname: '{{ influxdb__hostname }}'
-       login_username: 'someuser1'
-       login_password: 'somepassword1'
-
-Create an admin user on a remote host using custom login credentials
-
-.. code-block:: yaml
-
-   influxdb__users:
-     - user_name: 'someuser'
-       user_password: 'somepassword'
-       admin: yes
-       hostname: '{{ influxdb__hostname }}'
-       login_username: 'someuser1'
-       login_password: 'somepassword1'
-
-Create a user on localhost with privileges
-
-.. code-block:: yaml
-
-   influxdb__users:
-     - user_name: 'someuser'
-       user_password: 'somepassword'
-       admin: yes
-       login_username: 'someuser1'
-       login_password: 'somepassword1'
-       grants:
-         - database: 'db'
-           privilege: 'WRITE'
+  influxdb__users:
+    - user_name: 'someuser'
+      user_password: 'somepassword'
+      grants:
+        - database: 'dbname'
+          privilege: 'READ'
 
 influxdb__default_configuration
 -------------------------------
@@ -141,9 +114,14 @@ mechanism for getting data into and out of InfluxDB.
    influxdb__default_configuration:
    options:
      - bind-address: '":{{ influxdb__port }}"'
-     - https-enabled: 'true'
-     - auth-enabled: 'true'
+       https-enabled: '{{ "true" if influxdb__pki else "false" }}'
+       auth-enabled: '{{ "true" if influxdb__auth_enabled else "false" }}'
 
+Syntax
+~~~~~~
+
+The variables are YAML lists, each list entry is a YAML dictionary that uses
+specific parameters:
 
 ``name``
     Required. This parameter defines the option name, and it needs to be unique in a given configuration file
@@ -181,6 +159,7 @@ mechanism for getting data into and out of InfluxDB.
         matching tag key-value predicate is executed. Setting this value to ``0`` will
         disable the cache, which may lead to query performance issues. This value
         should only be increased if it is known that the set of regularly
+
 Examples
 ~~~~~~~~
 
@@ -195,8 +174,8 @@ Examples
   - name: 'data'
     options:
       - dir: '"/var/lib/influxdb/data"'
-      - wal-dir: '"/var/lib/influxdb/wal"'
-      - series-id-set-cache-size: '100'
+        wal-dir: '"/var/lib/influxdb/wal"'
+        series-id-set-cache-size: '100'
 
   - name: 'coordinator'
     options: []
@@ -213,8 +192,8 @@ Examples
   - name: 'http'
     options:
       - bind-address: '":{{ influxdb__port }}"'
-      - https-enabled: 'true'
-      - auth-enabled: 'true'
+        https-enabled: '{{ "true" if influxdb__pki else "false" }}'
+        auth-enabled: '{{ "true" if influxdb__auth_enabled else "false" }}'
 
   - name: 'logging'
     options: []

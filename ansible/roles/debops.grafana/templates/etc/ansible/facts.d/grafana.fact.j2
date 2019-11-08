@@ -14,6 +14,8 @@ def cmd_exists(cmd):
     )
 
 
-output['installed'] = cmd_exists('grafana')
+output = {}
+
+output['installed'] = cmd_exists('grafana-server')
 
 print(dumps(output, sort_keys=True, indent=4))

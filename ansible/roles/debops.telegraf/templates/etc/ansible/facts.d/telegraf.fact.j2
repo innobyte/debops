@@ -14,6 +14,8 @@ def cmd_exists(cmd):
     )
 
 
+output = {}
+
 output['installed'] = cmd_exists('telegraf')
 
 print(dumps(output, sort_keys=True, indent=4))

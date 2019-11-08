@@ -1,5 +1,8 @@
 ---
 
+- name: DebOps pre_tasks hook
+  include: "{{ lookup('task_src', 'influxdb/pre_main.yml') }}"
+
 - name: Install Influxdb requested packages
   package:
     name: '{{ q("flattened", influxdb__base_packages
@@ -31,8 +34,8 @@
     src: 'influxdb.conf.j2'
     dest: '/etc/influxdb/influxdb.conf'
     owner: 'root'
-    group: 'adm'
-    mode: '0644'
+    group: 'influxdb'
+    mode: '0640'
   notify: [ 'Restart influxdb' ]
 
 - name: Add database server user to specified groups
@@ -43,76 +46,100 @@
     createhome: False
   when: influxdb__pki|bool
 
+- name: Start database server on first install
+  service:
+    name: 'influxdb'
+    state: 'started'
+  when: (influxdb__register_packages|d() and influxdb__register_packages is changed)
+
+- name: Wait for InfluxDB port to be reachable
+  wait_for:
+    port: '{{ influxdb__port }}'
+    timeout: 30
+
 - name: Create admin user
   influxdb_user:
-    user_name: '{{ item.user_name | d(item.name) }}'
-    user_password: '{{ item.user_password | default(lookup("password",
-                  secret + "/influxdb/" +
-                  "/credentials/" + item.user_name | d(False) + "/password " +
-                  "length=" + influxdb__password_length)) }}'
-    login_username: '{{ item.login_username | d(omit) }}'
-    login_password: '{{ item.login_password | d(omit) }}'
-    ssl: true
-    admin: '{{ item.admin | d(omit) }}'
-    grants: '{{ item.grants | d(omit) }}'
-    hostname: '{{ item.hostname | default(influxdb__hostname) }}'
-    state: 'present'
-  with_flattened: '{{ influxdb__admin_users + influxdb__admin_dependent_users + influxdb__default_admin_users }}'
-  register: influxdb__register_create_users
-  when: ((item.user_name|d(False) or item.user_password|d(False) or login_password|d(False) or item.login_password|d(False)) and
-         (item.state is undefined or item.state != "absent"))
+    validate_certs: '{{ influxdb__validate_certs }}'
+    user_name: '{{ influxdb__admin_user }}'
+    user_password: '{{ lookup("password",
+                  secret + "/influxdb/" + ansible_hostname +
+                  "/credentials/" + influxdb__admin_user + "/password " +
+                  "length=" + influxdb__password_length) }}'
+    ssl: '{{ influxdb__pki }}'
+    admin: yes
+    hostname: '{{ influxdb__fqdn }}'
+  register: influxdb__register_create_admin_user
+  when: (not ansible_local.influxdb.admin_created
+         if (ansible_local|d() and ansible_local.influxdb|d()
+             and ansible_local.influxdb.admin_created|d())
+         else True)
 
 - name: Drop database
   influxdb_database:
-    hostname: '{{ item.hostname | d("localhost") }}'
+    validate_certs: '{{ influxdb__validate_certs }}'
+    hostname: '{{ influxdb__fqdn }}'
     database_name: '{{ item.database_name | d(item.name) }}'
     state: 'absent'
-    ssl: true
-    login_username: '{{ item.login_username | d(omit) }}'
-    login_password: '{{ item.login_password | d(omit) }}'
+    ssl: '{{ influxdb__pki }}'
+    login_username: '{{ influxdb__admin_user }}'
+    login_password: '{{ lookup("password",
+                  secret + "/influxdb/" + ansible_hostname +
+                  "/credentials/" + influxdb__admin_user + "/password " +
+                  "length=" + influxdb__password_length) }}'
+  delegate_to: '{{ ansible_hostname }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(item.name) or item.hostname|d("localhost") or item.login_username|d(False) or item.login_password|d(False)) and
+  when: ((item.database_name|d(item.name) or item.hostname|d("localhost")) and
          (item.state is defined and item.state == 'absent'))
 
 - name: Create database
   influxdb_database:
-    hostname: '{{ item.hostname | d("localhost") }}'
+    validate_certs: '{{ influxdb__validate_certs }}'
+    hostname: '{{ influxdb__fqdn }}'
     database_name: '{{ item.database_name | d(item.name) }}'
-    state: 'present'
-    login_username: '{{ item.login_username | d(omit) }}'
-    login_password: '{{ item.login_password | d(omit) }}'
+    ssl: '{{ influxdb__pki }}'
+    login_username: '{{ influxdb__admin_user }}'
+    login_password: '{{ lookup("password",
+                  secret + "/influxdb/" + ansible_hostname +
+                  "/credentials/" + influxdb__admin_user + "/password " +
+                  "length=" + influxdb__password_length) }}'
   with_flattened: '{{ influxdb__databases + influxdb__dependent_databases }}'
-  when: ((item.database_name|d(item.name) or item.hostname|d("localhost") or item.login_username|d(False) or item.login_password|d(False)) and
+  when: ((item.database_name|d() or item.hostname|d()) and
          (item.state is undefined or item.state != 'absent'))
   register: influxdb__register_database_status
 
 - name: Drop user
   influxdb_user:
+    validate_certs: '{{ influxdb__validate_certs }}'
     user_name: '{{ item.user_name | d(item.name) }}'
     user_password: '{{ item.user_password }}'
-    hostname: '{{ item.hostname | default(influxdb__hostname) }}'
+    hostname: '{{ influxdb__fqdn }}'
     state: 'absent'
-    ssl: true
+    ssl: '{{ influxdb__pki }}'
+  delegate_to: '{{ ansible_hostname }}'
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   when: ((item.user_name|d(False)) and
          (item.state is defined and item.state == "absent"))
 
 - name: Create user
   influxdb_user:
+    validate_certs: '{{ influxdb__validate_certs }}'
     user_name: '{{ item.user_name | d(item.name) }}'
-    user_password: '{{ item.user_password | default(lookup("password",
-                  secret + "/influxdb/" +
-                  "/credentials/" + item.user_name | d(False) + "/password " +
-                  "length=" + influxdb__password_length)) }}'
+    user_password: '{{ lookup("password",
+                  secret + "/influxdb/" + ansible_hostname +
+                  "/credentials/" + item.user_name + "/password " +
+                  "length=" + influxdb__password_length) }}'
     grants: '{{ item.grants | d(omit) }}'
-    ssl: true
-    hostname: '{{ item.hostname | default(influxdb__hostname) }}'
-    login_username: '{{ item.login_username | d(omit) }}'
-    login_password: '{{ item.login_password | d(omit) }}'
-    state: 'present'
+    hostname: '{{ influxdb__fqdn }}'
+    ssl: '{{ influxdb__pki }}'
+    login_username: '{{ influxdb__admin_user }}'
+    login_password: '{{ lookup("password",
+                  secret + "/influxdb/" + ansible_hostname +
+                  "/credentials/" + influxdb__admin_user + "/password " +
+                  "length=" + influxdb__password_length) }}'
+  delegate_to: '{{ ansible_hostname }}'
   with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   register: influxdb__register_create_users
-  when: ((item.user_name|d(False) or item.user_password|d(False) or item.login_username|d(False) or item.login_password|d(False)) and
+  when: ((item.user_name|d(False) or item.user_password|d(False)) and
          (item.state is undefined or item.state != "absent"))
 
 - name: Make sure that Ansible local facts directory exists
@@ -131,3 +158,18 @@
 - name: Update Ansible facts if they were modified
   action: setup
   when: influxdb__register_facts is changed
+
+# In order to create an admin user, the auth-enabled parameter needs to be disabled.
+# Once the admin is created, auth-enabled must be enabled
+- name: Reconfigure main influxdb config file
+  template:
+    src: 'influxdb.conf.j2'
+    dest: '/etc/influxdb/influxdb.conf'
+    owner: 'root'
+    group: 'influxdb'
+    mode: '0640'
+  notify: [ 'Restart influxdb' ]
+  when: influxdb__register_create_admin_user is changed
+
+- name: DebOps post_tasks hook
+  include: "{{ lookup('task_src', 'influxdb/post_main.yml') }}"
