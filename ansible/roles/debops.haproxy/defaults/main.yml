@@ -1,0 +1,95 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# debops.haproxy default variables
+# ================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../../includes/global.rst
+
+
+# Installation, APT packages [[[
+# ------------------------------
+
+# .. envvar:: haproxy__base_packages [[[
+#
+# List of APT base packages which are required by the Haproxy application.
+haproxy__base_packages: [ 'haproxy' ]
+
+                                                                   # ]]]
+# .. envvar:: haproxy__packages [[[
+#
+# List of APT packages which are required by the Haproxy application.
+haproxy__packages: []
+
+                                                                   # ]]]
+# .. envvar:: haproxy__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# haproxy server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+haproxy__allow: [ 0.0.0.0/0 ]
+
+                                                                   # ]]]
+# .. envvar:: haproxy__port [[[
+#
+# Port number on which this haproxy listens on.
+haproxy__port: '9123'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# Haproxy configuration file [[[
+# --------------------------------
+
+# The variables below define the contents of the
+# :file:`/etc/haproxy/haproxy.cfg` configuration file.
+# See :ref:`haproxy__ref_configuration` for more details.
+
+# .. envvar:: haproxy__default_configuration [[[
+#
+# The default configuration options which should be present in the main
+# configuration file.
+haproxy__default_configuration: []
+
+                                                                   # ]]]
+# .. envvar:: haproxy__configuration [[[
+#
+# List of configuration options defined on all hosts in the haproxy inventory.
+haproxy__configuration: []
+
+                                                                   # ]]]
+# .. envvar:: haproxy__combined_configuration [[[
+#
+# Actual list of haproxy configuration options passed to the
+# configuration template. This list defines the order in which the options from
+# different variables are processed.
+haproxy__combined_configuration: '{{ haproxy__default_configuration + haproxy__configuration }}'
+
+                                                                   # ]]]
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: haproxy__ferm__dependent_rules [[[
+#
+# Configuration for :ref:`debops.ferm` Haproxy role.
+haproxy__ferm__dependent_rules:
+
+  - type: 'accept'
+    dport: [ 'haproxy' ]
+    saddr: '{{ haproxy__allow }}'
+    accept_any: False
+    weight: '40'
+    role: 'haproxy'
+
+                                                                   # ]]]
+# .. envvar:: haproxy__etc_services__dependent_list [[[
+#
+# Configuration for the :ref:`debops.etc_services` Ansible role.
+haproxy__etc_services__dependent_list:
+
+  - name: 'haproxy'
+    port: '{{ haproxy__port }}'
+
+                                                                   # ]]]
