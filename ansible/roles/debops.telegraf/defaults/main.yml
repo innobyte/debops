@@ -26,6 +26,7 @@ telegraf__upstream_apt_id: '05CE15085FC09D18E99EFB22684A14CF2582E0C5'
 telegraf__upstream_apt_repository: 'deb https://repos.influxdata.com/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable'
 
                                                                    # ]]]
+                                                                   # ]]]
 # Installation, APT packages [[[
 # ------------------------------
 
@@ -64,6 +65,7 @@ telegraf__proc_hidepid_group: '{{ (ansible_local.proc_hidepid.group
                                    ansible_local.proc_hidepid.group|d())
                                else "") }}'
                                                                    # ]]]
+                                                                   # ]]]
 # APT packages [[[
 # ----------------
 
@@ -87,7 +89,7 @@ telegraf__keyring__dependent_apt_keys:
   - id: '{{ telegraf__upstream_apt_id }}'
     repo: '{{ telegraf__upstream_apt_repository }}'
     state: '{{ "present" if (telegraf__deploy_type == "upstream") else "absent" }}'
-                                                                   # ]]]
+
                                                                    # ]]]
 # .. envvar:: telegraf__allow [[[
 #
@@ -95,6 +97,7 @@ telegraf__keyring__dependent_apt_keys:
 # Telegraf server. If it's empty, remote connections are not allowed.
 telegraf__allow: [ '0.0.0.0/0' ]
 
+                                                                   # ]]]
                                                                    # ]]]
 # Telegraf configuration file [[[
 # ------------------------------------
@@ -181,4 +184,5 @@ telegraf__configuration: []
 # different variables are processed.
 telegraf__combined_configuration: '{{ telegraf__default_configuration + telegraf__configuration }}'
 
+                                                                   # ]]]
                                                                    # ]]]

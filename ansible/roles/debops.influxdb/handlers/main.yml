@@ -4,4 +4,3 @@
   service:
     name: 'influxdb'
     state: 'restarted'
-    enabled: yes

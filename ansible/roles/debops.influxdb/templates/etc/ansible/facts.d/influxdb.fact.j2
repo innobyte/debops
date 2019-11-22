@@ -14,6 +14,8 @@ def cmd_exists(cmd):
     )
 
 
-output['installed'] = cmd_exists('influxdb')
+output = {}
+output['installed'] = cmd_exists('influxd')
+output['admin_created'] = True
 
 print(dumps(output, sort_keys=True, indent=4))

@@ -34,4 +34,3 @@
       tags: [ 'role::ferm', 'skip::ferm' ]
       ferm__dependent_rules:
         - '{{ influxdb__ferm__dependent_rules }}'
-
