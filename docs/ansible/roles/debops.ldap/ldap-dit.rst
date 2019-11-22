@@ -22,6 +22,7 @@ Directory structure
 
           - :envvar:`cn=host.example.org <ldap__device_self_rdn>` (:envvar:`conditional <ldap__device_enabled>`)
 
+            - :ref:`uid=dokuwiki <dokuwiki__ref_ldap_dit>` -> :ref:`debops.dokuwiki`
             - :ref:`uid=gitlab <gitlab__ref_ldap_dit>` -> :ref:`debops.gitlab`
             - :ref:`uid=nslcd <nslcd__ref_ldap_dit>` -> :ref:`debops.nslcd`
             - :ref:`uid=nextcloud <owncloud__ref_ldap_dit>` -> :ref:`debops.owncloud`
@@ -31,14 +32,17 @@ Directory structure
 
       - :envvar:`ou=People <ldap__people_rdn>`
       - :envvar:`ou=Groups <ldap__groups_rdn>`
+
+        - :ref:`cn=DokuWiki Administrators <dokuwiki__ref_ldap_dit>` -> :ref:`debops.dokuwiki`
+
       - :envvar:`ou=Machines <ldap__machines_rdn>`
       - :envvar:`ou=Services <ldap__services_rdn>`
 
-      - :envvar:`ou=System Groups <ldap__system_groups_rdn>`
+      - :envvar:`ou=Roles <ldap__roles_rdn>`
 
-        - ``cn=Password Reset Agents`` (via the :file:`ldap/init-directory.yml` playbook)
+        - ``cn=Password Reset Agent`` (via the :file:`ldap/init-directory.yml` playbook)
 
-          - ``member``: :ref:`uid=nextcloud,cn=host.example.org,... <owncloud__ref_ldap_dit>` -> :ref:`debops.owncloud`
+          - ``roleOccupant``: :ref:`uid=nextcloud,cn=host.example.org,... <owncloud__ref_ldap_dit>` -> :ref:`debops.owncloud`
 
 
 Object Classes and Attributes
@@ -78,5 +82,7 @@ Child nodes
 - :envvar:`ansible_local.ldap.groups_rdn <ldap__groups_rdn>`
 
 - :envvar:`ansible_local.ldap.machines_rdn <ldap__machines_rdn>`
+
+- :envvar:`ansible_local.ldap.roles_rdn <ldap__roles_rdn>`
 
 - :envvar:`ansible_local.ldap.services_rdn <ldap__services_rdn>`

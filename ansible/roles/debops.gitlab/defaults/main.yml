@@ -603,7 +603,7 @@ gitlab_shell_git_checkout: '{{ gitlab_app_root_path + "/gitlab-shell" }}'
 # .. envvar:: gitlab_ce_git_repo [[[
 #
 # URL of the GitLab CE repository.
-gitlab_ce_git_repo: 'https://gitlab.com/gitlab-org/gitlab-ce.git'
+gitlab_ce_git_repo: 'https://gitlab.com/gitlab-org/gitlab-foss.git'
 
                                                                    # ]]]
 # .. envvar:: gitlab_ce_git_dest [[[
@@ -1239,6 +1239,7 @@ gitlab__nginx_server:
   type: 'rails'
   name: '{{ gitlab__fqdn }}'
   root: '{{ gitlab_ce_git_checkout }}/public'
+  webroot_create: False
 
   deny_hidden: False
 

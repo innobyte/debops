@@ -110,16 +110,6 @@
 
 # ownCloud applications configuration [[[1
 
-- name: Combine owncloud__apps_config variables
-  set_fact:
-    owncloud__apps_config_combined: '{{
-                owncloud__dependent_apps_config
-      | combine(owncloud__role_apps_config)
-      | combine(owncloud__apps_config)
-      | combine(owncloud__group_apps_config)
-      | combine(owncloud__host_apps_config) }}'
-  tags: [ 'role::owncloud:occ_config' ]
-
 - name: Get current ownCloud configuration via occ config:list
   include: 'run_occ.yml'
   loop_control:
@@ -142,7 +132,7 @@
   loop_control:
     loop_var: 'owncloud__apps_item'
   with_dict: '{{ owncloud__apps_config_combined|d({}) }}'
-  when: (owncloud__do_autosetup|bool and not ansible_check_mode)
+  when: (owncloud__do_autosetup|d()|bool and not ansible_check_mode)
   tags: [ 'role::owncloud:occ_config' ]
 
 # .. ]]]

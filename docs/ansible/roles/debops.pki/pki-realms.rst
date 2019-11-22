@@ -26,12 +26,13 @@ X.509 certificates and private keys.
 In different guides that describe setting up TLS for different services like
 webservers, mail servers, databases, etc.  the private keys and X.509
 certificates are usually put in different directories - for example
-/etc/nginx/ssl/, /etc/postfix/certs/, /etc/ssl/certs/, and so on. The
-:ref:`debops.pki` role turns this around by setting up an uniform set of
-directories split into "PKI realms", so that a host can have multiple sets of
-certificates, each for different purposes. Then, various services can be
-configured to get the private key and certificate files from those specific
-directories, including privileged access to the private keys when needed.
+:file:`/etc/nginx/ssl/`, :file:`/etc/postfix/certs/`, :file:`/etc/ssl/certs/`,
+and so on. The :ref:`debops.pki` role turns this around by setting up an
+uniform set of directories split into "PKI realms", so that a host can have
+multiple sets of certificates, each for different purposes. Then, various
+services can be configured to get the private key and certificate files from
+those specific directories, including privileged access to the private keys
+when needed.
 
 PKI realms have a concept of multiple certificate authorities - there's one set
 of private keys which can be signed by different CAs - internal CA, external
@@ -83,14 +84,13 @@ the next section). The contents of these files are:
 
 :file:`default.key`
   This is the server private key. It's readable only by the ``root`` account
-  and by selected UNIX group – this can be used to limit access to different
-  private keys by different UNIX accounts.
-  FIXME: selected UNIX group
+  and by :envvar:`pki_private_group` – this can be used to limit access to
+  different private keys by different UNIX accounts.
 
 :file:`default.pem`
   This file contains the private key, server certificate and Intermediate
   CA certificate(s). It has the same restrictions as the private key – can be
-  read only by the ``root`` account and selected UNIX group.
+  read only by the ``root`` account and by :envvar:`pki_private_group`.
 
 :file:`trusted.crt`
   This is the complete trust chain of intermediate and root CA certificates,
@@ -175,6 +175,7 @@ is provided by the internal ``debops.pki`` Certificate Authority:
        │   ├── cert.pem -> ../internal/cert.pem
        │   ├── cert.pem.sig
        │   ├── chain.pem -> cert_intermediate_dhparam.pem
+       │   ├── full.pem
        │   ├── intermediate_root.pem
        │   ├── root.pem -> ../internal/root.pem
        │   └── trusted.pem -> intermediate_root.pem
@@ -304,7 +305,8 @@ host that has created it). This is done, so that services depending on the
 existence of the private keys and certificates can function correctly at all
 times.
 
-The :program:`pki-realm` script checks which of these directories have valid
+The :program:`pki-realm` script, located in :file:`/usr/local/lib/pki` on
+remote hosts, checks which of these directories have valid
 certificates in order of :envvar:`pki_authority_preference`, and the first
 valid one is used as the "active" directory.  Files from the active directory
 are symlinked to the :file:`public/` directory.
@@ -313,7 +315,9 @@ The :file:`public/` directory holds the currently active certificates which are
 symlinks to the real certificate files in one of the active directories mentioned above.
 Some additional files are also created here by the :program:`pki-realm` script, namely
 the certificate chain (server certificate + intermediate certificates) and the
-trusted chain (intermediate certificates + root certificate).
+trusted chain (intermediate certificates + root certificate). The full
+certificate contains server certificate + intermediate certificates + root
+certificate, which might be required by some applications.
 
 The :file:`private/` directory holds the private key of a given realm. Access to
 this directory and files inside is restricted by UNIX permissions and only
@@ -382,7 +386,7 @@ the "root" CA. The :file:`hostname.example.com/domain/` directory inside the
 ``hostname.example.com`` host.
 
 When all of the requests from the remote hosts are uploaded to the Ansible
-Controller, the :program:`pki-authority` script inside the :file:`secret/` directory takes
+Controller, the :program:`pki-authority` script inside the :file:`secret/lib` directory takes
 over and performs certificate signing for all of the currently managed hosts.
 The certificate named :file:`cert.pem` is placed in the :file:`internal/`
 directory of each host according to the realm the request came from.
@@ -510,6 +514,7 @@ available for other applications and services:
         │   ├── cert.pem -> ../internal/cert.pem
         │   ├── cert.pem.sig
         │   ├── chain.pem -> cert_intermediate_dhparam.pem
+        │   ├── full.pem
         │   ├── intermediate_root.pem
         │   ├── root.pem -> ../internal/root.pem
         │   └── trusted.pem -> intermediate_root.pem

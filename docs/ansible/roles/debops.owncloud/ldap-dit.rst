@@ -14,11 +14,11 @@ Directory structure
 
   - :envvar:`uid=nextcloud <owncloud__ldap_self_rdn>`
 
-- :ref:`ou=System Groups <ldap__ref_ldap_dit>` -> :ref:`debops.ldap`
+- :ref:`ou=Roles <ldap__ref_ldap_dit>` -> :ref:`debops.ldap`
 
-  - ``cn=Password Reset Agents``
+  - ``cn=Password Reset Agent``
 
-    - ``member``: :envvar:`uid=nextcloud,cn=host.example.org,... <owncloud__ldap_binddn>`
+    - ``roleOccupant``: :envvar:`uid=nextcloud,cn=host.example.org,... <owncloud__ldap_binddn>`
 
 
 Object Classes and Attributes
@@ -27,6 +27,12 @@ Object Classes and Attributes
 - :envvar:`uid=nextcloud <owncloud__ldap_self_rdn>`
 
   - :ref:`debops.owncloud`: :envvar:`Object Classes <owncloud__ldap_self_object_classes>`, :envvar:`Attributes <owncloud__ldap_self_attributes>`
+
+Custom objectClasses and attributes from the :ref:`nextcloud
+<slapd__ref_nextcloud>` LDAP schema:
+
+- objectClass ``nextcloudAccount``, attributes ``nextcloudEnabled``, ``nextcloudQuota``
+- objectClass ``nextcloudGroup``, attributes ``nextcloudEnabled``
 
 
 .. _owncloud__ref_ldap_dit_access:

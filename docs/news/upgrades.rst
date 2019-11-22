@@ -119,7 +119,7 @@ Inventory variable changes
   ============================================== =============================================== ==============================
   :envvar:`owncloud__ldap_login_filter`          ``(&(|(objectclass=inetOrgPerson))(uid=%uid))`` too large; see the variable
   ---------------------------------------------- ----------------------------------------------- ------------------------------
-  :envvar:`owncloud__ldap_group_filter`          ``(&(|(objectclass=posixGroup)))``              ``(objectClass=groupOfNames)``
+  :envvar:`owncloud__ldap_group_filter`          ``(&(|(objectclass=posixGroup)))``              too large; see the variable
   ---------------------------------------------- ----------------------------------------------- ------------------------------
   :envvar:`owncloud__ldap_group_assoc_attribute` ``memberUid``                                   ``member``
   ============================================== =============================================== ==============================
@@ -127,6 +127,22 @@ Inventory variable changes
   Support for the :ref:`memberOf overlay <slapd__ref_memberof_overlay>` has
   also been enabled by default, since the overlay is included in
   :ref:`debops.slapd` role.
+
+- In the :ref:`debops.ferm` role, some of the connection tracking parameters
+  have been renamed:
+
+  +-------------------------+----------------------------------+---------------+
+  | Old parameter name      | New parameter name               | Changed value |
+  +=========================+==================================+===============+
+  | ``item.active_target``  | ``item.tracking_active_target``  | No            |
+  +-------------------------+----------------------------------+---------------+
+  | ``item.invalid_target`` | ``item.tracking_invalid_target`` | No            |
+  +-------------------------+----------------------------------+---------------+
+  | ``item.module``         | ``item.tracking_module``         | No            |
+  +-------------------------+----------------------------------+---------------+
+
+  See :ref:`ferm__ref_type_connection_tracking` for more details about
+  connection tracking.
 
 
 v1.1.0 (2019-08-25)
