@@ -14,9 +14,9 @@
   args:
     creates: '/etc/haproxy/haproxy.cfg.dpkg-divert'
 
-- name: Generate default haproxy configuration
+- name: Generate haproxy configuration
   template:
-    src: '{{ lookup("template_src", "haproxy/haproxy.cfg") }}'
+    src: '{{ lookup("template_src", "haproxy/haproxy.cfg.j2") }}'
     dest: '/etc/haproxy/haproxy.cfg'
     mode: '0644'
   notify: [ 'Restart haproxy' ]

@@ -51,7 +51,125 @@ haproxy__port: '9123'
 #
 # The default configuration options which should be present in the main
 # configuration file.
-haproxy__default_configuration: []
+haproxy__default_configuration:
+
+  - name: 'global'
+    options:
+
+      - name: 'log /dev/log'
+        value: 'local0'
+        state: 'present'
+
+      - name: 'log /dev/log'
+        value: 'local1 notice'
+        state: 'present'
+
+      - name: 'chroot'
+        value: '/var/lib/haproxy'
+        state: 'present'
+
+      - name: 'stats socket'
+        value: '/run/haproxy/admin.sock mode 660 level admin expose-fd listeners'
+        state: 'present'
+
+      - name: 'stats timeout'
+        value: '30s'
+        state: 'present'
+
+      - name: 'user'
+        value: 'haproxy'
+        state: 'present'
+
+      - name: 'group'
+        value: 'haproxy'
+        state: 'present'
+
+      - name: 'daemon'
+        value: ' '
+        state: 'present'
+
+      - name: 'ca-base'
+        comment: 'Default SSL material locations'
+        value: '/etc/ssl/certs'
+        state: 'present'
+
+      - name: 'crt-base'
+        value: '/etc/ssl/private'
+        state: 'present'
+
+      - name: 'ssl-default-bind-ciphers'
+        comment: |
+                  Default ciphers to use on SSL-enabled listening sockets.
+                  For more information, see ciphers(1SSL). This list is from:
+                  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
+                  An alternative list with additional directives can be obtained from
+                  https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=haproxy
+        value: 'ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS'
+        state: 'present'
+
+      - name: 'ssl-default-bind-options'
+        value: 'no-sslv3'
+        state: 'present'
+
+  - name: 'defaults'
+    options:
+
+      - name: 'log'
+        value: 'global'
+        state: 'present'
+
+      - name: 'mode'
+        value: 'http'
+        state: 'present'
+
+      - name: 'optionhttplog'
+        option: 'option'
+        value: 'httplog'
+        state: 'present'
+
+      - name: 'option'
+        value: 'dontlognull'
+        state: 'present'
+
+      - name: 'timeout connect'
+        value: '5000'
+        state: 'present'
+
+      - name: 'timeout client'
+        value: '50000'
+        state: 'present'
+
+      - name: 'timeout server'
+        value: '50000'
+        state: 'present'
+
+      - name: 'errorfile 400'
+        value: '/etc/haproxy/errors/400.http'
+        state: 'present'
+
+      - name: 'errorfile 403'
+        value: '/etc/haproxy/errors/403.http'
+        state: 'present'
+
+      - name: 'errorfile 408'
+        value: '/etc/haproxy/errors/408.http'
+        state: 'present'
+
+      - name: 'errorfile 500'
+        value: '/etc/haproxy/errors/500.http'
+        state: 'present'
+
+      - name: 'errorfile 502'
+        value: '/etc/haproxy/errors/502.http'
+        state: 'present'
+
+      - name: 'errorfile 503'
+        value: '/etc/haproxy/errors/503.http'
+        state: 'present'
+
+      - name: 'errorfile 504'
+        value: '/etc/haproxy/errors/504.http'
+        state: 'present'
 
                                                                    # ]]]
 # .. envvar:: haproxy__configuration [[[
@@ -67,6 +185,7 @@ haproxy__configuration: []
 # different variables are processed.
 haproxy__combined_configuration: '{{ haproxy__default_configuration + haproxy__configuration }}'
 
+                                                                   # ]]]
                                                                    # ]]]
 # Configuration for other Ansible roles [[[
 # -----------------------------------------
@@ -92,4 +211,5 @@ haproxy__etc_services__dependent_list:
   - name: 'haproxy'
     port: '{{ haproxy__port }}'
 
+                                                                   # ]]]
                                                                    # ]]]
