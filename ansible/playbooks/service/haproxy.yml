@@ -1,7 +1,7 @@
 ---
 
 - name: Manage Haproxy
-  hosts: [ 'debops_service_haproxy', 'debops_haproxy' ]
+  hosts: [ 'debops_service_haproxy' ]
   become: True
 
   environment: '{{ inventory__environment | d({})
@@ -9,11 +9,6 @@
                    | combine(inventory__host_environment  | d({})) }}'
 
   roles:
-
-    - role: debops.etc_services
-      tags: [ 'role::etc_services', 'skip::etc_services' ]
-      etc_services__dependent_list:
-        - '{{ haproxy__etc_services__dependent_list }}'
 
     - role: debops.ferm
       tags: [ 'role::ferm', 'skip::ferm' ]

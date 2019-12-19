@@ -33,12 +33,6 @@ haproxy__packages: []
 haproxy__allow: [ 0.0.0.0/0 ]
 
                                                                    # ]]]
-# .. envvar:: haproxy__port [[[
-#
-# Port number on which this haproxy listens on.
-haproxy__port: '9123'
-
-                                                                   # ]]]
                                                                    # ]]]
 # Haproxy configuration file [[[
 # --------------------------------
@@ -196,20 +190,11 @@ haproxy__combined_configuration: '{{ haproxy__default_configuration + haproxy__c
 haproxy__ferm__dependent_rules:
 
   - type: 'accept'
-    dport: [ 'haproxy' ]
+    dport: [ 'http', 'https' ]
     saddr: '{{ haproxy__allow }}'
     accept_any: False
     weight: '40'
     role: 'haproxy'
-
-                                                                   # ]]]
-# .. envvar:: haproxy__etc_services__dependent_list [[[
-#
-# Configuration for the :ref:`debops.etc_services` Ansible role.
-haproxy__etc_services__dependent_list:
-
-  - name: 'haproxy'
-    port: '{{ haproxy__port }}'
 
                                                                    # ]]]
                                                                    # ]]]
