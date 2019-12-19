@@ -1,5 +1,14 @@
 ---
 
+- import_role:
+    name: 'debops.ansible_plugins'
+
+- name: Make sure that Ansible local fact directory exists
+  file:
+    path: '/etc/ansible/facts.d'
+    state: 'directory'
+    mode: '0755'
+
 - name: Install required packages
   package:
     name: '{{ q("flattened", (jenkins__base_packages
@@ -7,9 +16,37 @@
     state: 'present'
   register: jenkins__register_packages
   until: jenkins__register_packages is succeeded
+  notify: [ 'Restart Jenkins' ]
 
-- name: Start Jenkins on first install
-  service:
-    name: 'jenkins'
-    state: 'started'
-  when: (jenkins__register_packages|d() and jenkins__register_packages is changed)
+#- name: Start Jenkins on first install
+#  service:
+#    name: 'jenkins'
+#    state: 'started'
+#  when: (jenkins__register_packages|d() and jenkins__register_packages is changed)
+
+- name: Divert the original jenkins configuration
+  dpkg_divert:
+    path: '/etc/default/jenkins'
+    state: 'present'
+    delete: True
+
+#- name: Install plugins
+#  jenkins_plugin:
+#    name: '{{ item.name }}'
+#    state: '{{ item.state | d("present")}}'
+#    url: '{{"http://localhost:" + jenkins__port }}'
+#    url_username: '{{ jenkins__admin_username }}'
+#    url_password: '{{ jenkins__admin_password }}'
+#    with_dependencies: '{{ item.with_dependencies | d("yes") }}'
+#  loop: '{{ jenkins__combined_plugins | parse_kv_items }}'
+
+# Manage admin password
+
+- name: Generate Jenkins configuration
+  template:
+    src: 'etc/default/jenkins.j2'
+    dest: '/etc/default/jenkins'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: [ 'Restart Jenkins' ]

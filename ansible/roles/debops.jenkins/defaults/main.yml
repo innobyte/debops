@@ -38,6 +38,227 @@ jenkins__base_packages:
 # List of additional APT packages to install with Jenkins.
 jenkins__packages: []
                                                                    # ]]]
+# .. envvar:: jenkins__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Jenkins in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+jenkins__allow: []
+
+                                                                   # ]]]
+# .. envvar:: jenkins__port [[[
+#
+# Port number on which this Jenkins listens on.
+jenkins__port: '8793'
+                                                                   # ]]]
+
+# Jenkins configuration [[[
+# -------------------------
+
+# .. envvar:: jenkins__fqdn [[[
+#
+# The Fully Qualified domain names on which the Jenkins
+# application will be available, used by the webserver.
+jenkins__fqdn: 'jenkins.{{ jenkins__domain }}'
+                                                                   # ]]]
+# .. envvar:: jenkins__domain [[[
+#
+# The DNS domain used by other variables in the ``debops.jenkins`` role.
+jenkins__domain: '{{ ansible_local.core.domain
+                    if (ansible_local|d() and ansible_local.core|d() and
+                        ansible_local.core.domain|d())
+                    else ansible_domain }}'
+                                                                   # ]]]
+
+# .. envvar:: jenkins__nginx_enabled: True [[[
+#
+# Enable or disable Nginx dependencies
+jenkins__nginx_enabled: True
+                                                                   # ]]]
+# .. envvar:: jenkins__admin_username [[[
+#
+# Admin user that will be created at install
+jenkins__admin_username: 'admin'
+                                                                   # ]]]
+# .. envvar:: jenkins__admin_password [[[
+#
+# Admin password that will be created at install
+jenkins__admin_password: "{{ lookup('password', secret + '/credentials/'
+                             + ansible_fqdn + '/jenkins/' + jenkins__admin_username
+                             chars=hexdigits length=32') }}"
+                                                                   # ]]]
+
+# .. envvar:: jenkins__default_plugins [[[
+#
+# Default plugins that will be installed
+jenkins__default_plugins:
+  - name: 'cloudbees-folder'
+  - name: 'antisamy-markup-formatter'
+  - name: 'build-timeout'
+  - name: 'credentials-binding'
+  - name: 'timestamper'
+  - name: 'ws-cleanup'
+  - name: 'ant'
+  - name: 'gradle'
+  - name: 'workflow-aggregator'
+  - name: 'github-branch-source'
+  - name: 'pipeline-github-lib'
+  - name: 'pipeline-stage-view'
+  - name: 'git'
+  - name: 'subversion'
+  - name: 'ssh-slaves'
+  - name: 'matrix-auth'
+  - name: 'pam-auth'
+  - name: 'ldap'
+  - name: 'email-ext'
+  - name: 'mailer'
+                                                                   # ]]]
+# .. envvar:: jenkins__group_plugins [[[
+#
+# Plugins that will be installed on hosts in specific groups
+jenkins__group_plugins: []
+
+# .. envvar:: jenkins__host_plugins [[[
+#
+# Plugins that will be installed on host
+jenkins__host_plugins: []
+                                                                   # ]]]
+# .. envvar:: jenkins__combined_plugins [[[
+#
+#
+jenkins__combined_plugins: '{{ jenkins__default_plugins
+                              + jenkins__group_plugins
+                              + jenkins__host_plugins }}'
+                                                                   # ]]]
+# .. envvar:: jenkins__default_parameters [[[
+#
+#
+jenkins__default_parameters:
+
+  - name: 'NAME'
+    comment: |
+      pulled in from the init script; makes things easier.
+    value: 'jenkins'
+
+  - name: 'JAVA_ARGS'
+    comment: |
+        Allow graphs etc. to work even when an X server is present
+
+        JAVA_ARGS="-Xmx256m"
+
+        make jenkins listen on IPv4 address
+        JAVA_ARGS="-Djava.net.preferIPv4Stack=true"
+    value: '"-Djava.awt.headless=true"'
+
+  - name: 'PIDFILE'
+    value: '/var/run/$NAME/$NAME.pid'
+
+  - name: 'JENKINS_USER'
+    comment: |
+      user to be invoked as (default to jenkins)
+    value: '$NAME'
+
+  - name: 'JENKINS_GROUP'
+    comment: |
+      group to be invoked as (default to jenkins)
+    value: '$NAME'
+
+  - name: 'JENKINS_WAR'
+    comment: |
+      location of the jenkins war file
+    value: '/usr/share/$NAME/$NAME.war'
+
+  - name: 'JENKINS_HOME'
+    comment: |
+      jenkins home location
+    value: '/var/lib/$NAME'
+
+  - name: 'RUN_STANDALONE'
+    comment: |
+      set this to false if you don't want Jenkins to run by itself
+      in this set up, you are expected to provide a servlet container
+      to host jenkins
+    value: 'true'
+
+  - name: 'JENKINS_LOG'
+    comment: |
+      log location.  this may be a syslog facility.priority
+      JENKINS_LOG=daemon.info
+    value: '/var/log/$NAME/$NAME.log'
+
+  - name: 'JENKINS_ENABLE_ACCESS_LOG'
+    comment: |
+      Whether to enable web access logging or not.
+      Set to "yes" to enable logging to /var/log/$NAME/access_log
+    value: '"no"'
+
+  - name: 'MAXOPENFILES'
+    comment: |
+      OS LIMITS SETUP
+         comment this out to observe /etc/security/limits.conf
+         this is on by default because http://github.com/jenkinsci/jenkins/commit/2fb288474e980d0e7ff9c4a3b768874835a3e92e
+         reported that Ubuntu's PAM configuration doesn't include pam_limits.so, and as a result the # of file
+         descriptors are forced to 1024 regardless of /etc/security/limits.conf
+    value: '8192'
+
+  - name: 'UMASK'
+    comment: |
+       set the umask to control permission bits of files that Jenkins creates.
+         027 makes files read-only for group and inaccessible for others, which some security sensitive users
+         might consider benefitial, especially if Jenkins runs in a box that's used for multiple purposes.
+         Beware that 027 permission would interfere with sudo scripts that run on the master (JENKINS-25065.)
+
+         Note also that the particularly sensitive part of $JENKINS_HOME (such as credentials) are always
+         written without 'others' access. So the umask values only affect job configuration, build records,
+         that sort of things.
+
+         If commented out, the value from the OS is inherited,  which is normally 022 (as of Ubuntu 12.04,
+         by default umask comes from pam_umask(8) and /etc/login.defs
+    value: '027'
+    state: 'comment'
+
+  - name: 'HTTP_PORT'
+    comment: |
+      port for HTTP connector (disable with -1)
+    value: '{{ jenkins__port }}'
+
+  - name: 'PREFIX'
+    comment: |
+      servlet context, important if you want to use apache proxying
+    value: '/$NAME'
+
+  - name: 'JENKINS_ARGS'
+    comment: |
+       arguments to pass to jenkins.
+       --javahome=$JAVA_HOME
+       --httpListenAddress=$HTTP_HOST (default 0.0.0.0)
+       --httpPort=$HTTP_PORT (default 8080; disable with -1)
+       --httpsPort=$HTTP_PORT
+       --argumentsRealm.passwd.$ADMIN_USER=[password]
+       --argumentsRealm.roles.$ADMIN_USER=admin
+       --webroot=~/.jenkins/war
+       --prefix=$PREFIX
+    value: '"--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT"'
+                                                                   # ]]]
+# .. envvar:: jenkins__group_parameters [[[
+#
+#
+jenkins__group_parameters: []
+                                                                   # ]]]
+# .. envvar:: jenkins__host_parameters [[[
+#
+#
+jenkins__host_parameters: []
+                                                                   # ]]]
+# .. envvar:: jenkins__combined_parameters [[[
+#
+#
+jenkins__combined_parameters: '{{ jenkins__default_parameters
+                                 + jenkins__group_parameters
+                                 + jenkins__host_parameters }}'
+                                                                   # ]]]
+                                                                   # ]]]
+
 # Configuration for other Ansible roles [[[
 # -----------------------------------------
 
@@ -51,6 +272,48 @@ jenkins__keyring__dependent_apt_keys:
     repo: '{{ jenkins__upstream_apt_repository }}'
 
                                                                    # ]]]
-# Firewall
-# Nginx
+# .. envvar:: jenkins__ferm__dependent_rules [[[
+#
+# Configuration for :ref:`debops.ferm` Ansible role.
+# Allow access on ``jenkins__port`` when nginx is not enabled
+jenkins__ferm__dependent_rules:
+
+  - type: 'accept'
+    dport: [ 'jenkins' ]
+    saddr: '{{ jenkins__allow }}'
+    accept_any: True
+    weight: '40'
+    role: 'jenkins'
+    rule_state: '{{ "absent" if (jenkins__nginx_enabled | bool) else "present" }}'
+                                                                   # ]]]
+
+# .. envvar:: jenkins__etc_services__dependent_list [[[
+#
+# Configuration for the :ref:`debops.etc_services` Ansible role.
+jenkins__etc_services__dependent_list:
+
+  - name: 'jenkins'
+    port: '{{ jenkins__port }}'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__nginx__dependent_upstreams [[[
+#
+# Upstream configuration for the :ref:`debops.nginx` Ansible role.
+jenkins__nginx__dependent_upstreams:
+  - name: 'jenkins'
+    server: [ 'localhost' ]
+    port: '{{ jenkins__port }}'
+
+                                                                   # ]]]
+# .. envvar:: jenkins__nginx__dependent_servers [[[
+#
+# Server configuration for the :ref:`debops.nginx` Ansible role.
+jenkins__nginx__dependent_servers:
+  - name: '{{ jenkins__fqdn }}'
+    by_role: 'debops.jenkins'
+    filename: 'debops.jenkins'
+    type: proxy
+    proxy_pass: 'http://jenkins'
+
+                                                                   # ]]]
                                                                    # ]]]
