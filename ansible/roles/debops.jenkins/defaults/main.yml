@@ -91,7 +91,7 @@ jenkins__admin_username: 'admin'
 # Admin password that will be created at install
 jenkins__admin_password: "{{ lookup('password', secret + '/credentials/'
                              + ansible_fqdn + '/jenkins/' + jenkins__admin_username
-                             chars=hexdigits length=32') }}"
+                             + '/password chars=hexdigits length=32') }}"
                                                                    # ]]]
 
 # .. envvar:: jenkins__default_plugins [[[
