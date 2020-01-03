@@ -24,6 +24,14 @@
     state: 'present'
     delete: True
 
+- name: Create custom init scripts directory.
+  file:
+    path: "{{ jenkins__home }}/init.groovy.d"
+    state: directory
+    owner: "jenkins"
+    group: "jenkins"
+    mode: 0775
+
 - name: Setup jenkins password
   template:
     src: 'var/lib/jenkins/init.groovy.d/basic-security.groovy.j2'
