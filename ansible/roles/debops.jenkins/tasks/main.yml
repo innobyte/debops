@@ -18,29 +18,28 @@
   until: jenkins__register_packages is succeeded
   notify: [ 'Restart Jenkins' ]
 
-#- name: Start Jenkins on first install
-#  service:
-#    name: 'jenkins'
-#    state: 'started'
-#  when: (jenkins__register_packages|d() and jenkins__register_packages is changed)
-
 - name: Divert the original jenkins configuration
   dpkg_divert:
     path: '/etc/default/jenkins'
     state: 'present'
     delete: True
 
-#- name: Install plugins
-#  jenkins_plugin:
-#    name: '{{ item.name }}'
-#    state: '{{ item.state | d("present")}}'
-#    url: '{{"http://localhost:" + jenkins__port }}'
-#    url_username: '{{ jenkins__admin_username }}'
-#    url_password: '{{ jenkins__admin_password }}'
-#    with_dependencies: '{{ item.with_dependencies | d("yes") }}'
-#  loop: '{{ jenkins__combined_plugins | parse_kv_items }}'
+- name: Setup jenkins password
+  template:
+    src: 'var/lib/jenkins/init.groovy.d/basic-security.groovy.j2'
+    dest: '{{ jenkins__home }}/init.groovy.d/basic-security.groovy'
+    owner: 'root'
+    group: 'jenkins'
+    mode: '0750'
+  when: (ansible_local|d() and not (ansible_local.jenkins|d() and
+    (ansible_local.jenkins.installed|d()))|bool)
+  notify: [ 'Restart Jenkins' ]
 
-# Manage admin password
+- name: Ensure the script that forces the admin password is removed
+  file:
+    path: '{{ jenkins__home }}/init.groovy.d/basic-security.groovy'
+    state: absent
+  notify: [ 'Restart Jenkins' ]
 
 - name: Generate Jenkins configuration
   template:
@@ -50,3 +49,22 @@
     group: 'root'
     mode: '0644'
   notify: [ 'Restart Jenkins' ]
+
+- name: Install plugins
+  jenkins_plugin:
+    name: '{{ item.name }}'
+    state: '{{ item.state | d("present")}}'
+    url: '{{"http://localhost:" + jenkins__port }}'
+    url_username: '{{ jenkins__admin_username }}'
+    url_password: '{{ jenkins__admin_password }}'
+    with_dependencies: '{{ item.with_dependencies | d("yes") }}'
+  loop: '{{ jenkins__combined_plugins | parse_kv_items }}'
+
+- name: Save Jenkins local facts
+  template:
+    src: 'etc/ansible/facts.d/jenkins.fact.j2'
+    dest: '/etc/ansible/facts.d/jenkins.fact'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  register: jenkins__register_facts

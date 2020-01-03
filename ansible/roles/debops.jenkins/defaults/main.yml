@@ -55,6 +55,12 @@ jenkins__port: '8793'
 # Jenkins configuration [[[
 # -------------------------
 
+# .. envvar:: jenkins__home [[[
+#
+# The home folder where jenkins will be installed
+jenkins__home: '/var/lib/jenkins'
+                                                                   # ]]]
+
 # .. envvar:: jenkins__fqdn [[[
 #
 # The Fully Qualified domain names on which the Jenkins
@@ -125,14 +131,14 @@ jenkins__host_plugins: []
                                                                    # ]]]
 # .. envvar:: jenkins__combined_plugins [[[
 #
-#
+# The combined list of plugins
 jenkins__combined_plugins: '{{ jenkins__default_plugins
                               + jenkins__group_plugins
                               + jenkins__host_plugins }}'
                                                                    # ]]]
 # .. envvar:: jenkins__default_parameters [[[
 #
-#
+# Parameters to compose the default jenkins configuration file
 jenkins__default_parameters:
 
   - name: 'NAME'
@@ -171,7 +177,7 @@ jenkins__default_parameters:
   - name: 'JENKINS_HOME'
     comment: |
       jenkins home location
-    value: '/var/lib/$NAME'
+    value: '{{ jenkins__home }}'
 
   - name: 'RUN_STANDALONE'
     comment: |

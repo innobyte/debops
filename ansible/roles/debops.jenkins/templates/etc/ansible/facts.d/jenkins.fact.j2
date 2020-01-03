@@ -1,3 +1,7 @@
 #!{{ ansible_python['executable'] }}
 
 # {{ ansible_managed }}
+
+output = {'installed': True}
+
+print(dumps(output, sort_keys=True, indent=4))
