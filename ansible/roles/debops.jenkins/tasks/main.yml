@@ -41,7 +41,13 @@
     mode: '0750'
   when: (ansible_local|d() and not (ansible_local.jenkins|d() and
     (ansible_local.jenkins.installed|d()))|bool)
-  notify: [ 'Restart Jenkins' ]
+
+- name: Restart Jenkins to set the new password
+  service:
+    name: 'jenkins'
+    state: 'restarted'
+  when: (ansible_local|d() and not (ansible_local.jenkins|d() and
+    (ansible_local.jenkins.installed|d()))|bool)
 
 - name: Ensure the script that forces the admin password is removed
   file:
