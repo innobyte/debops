@@ -64,15 +64,15 @@
     mode: '0644'
   notify: [ 'Restart Jenkins' ]
 
-- name: Install plugins
-  jenkins_plugin:
-    name: '{{ item.name }}'
-    state: '{{ item.state | d("present")}}'
-    url: '{{"http://localhost:" + jenkins__port }}'
-    url_username: '{{ jenkins__admin_username }}'
-    url_password: '{{ jenkins__admin_password }}'
-    with_dependencies: '{{ item.with_dependencies | d("yes") }}'
-  loop: '{{ jenkins__combined_plugins | parse_kv_items }}'
+#- name: Install plugins
+#  jenkins_plugin:
+#    name: '{{ item.name }}'
+#    state: '{{ item.state | d("present")}}'
+#    url: '{{"http://localhost:" + jenkins__port }}'
+#    url_username: '{{ jenkins__admin_username }}'
+#    url_password: '{{ jenkins__admin_password }}'
+#    with_dependencies: '{{ item.with_dependencies | d("yes") }}'
+#  loop: '{{ jenkins__combined_plugins | parse_kv_items }}'
 
 - name: Save Jenkins local facts
   template:
