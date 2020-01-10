@@ -99,3 +99,5 @@
 - import_playbook: varnish.yml
 
 - import_playbook: influxdb.yml
+
+- import_playbook: telegraf.yml
