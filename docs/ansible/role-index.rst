@@ -203,6 +203,7 @@ Logging
 - :ref:`debops.kibana`
 - :ref:`debops.logrotate`
 - :ref:`debops.rsyslog`
+- :ref:`debops.telegraf`
 
 
 Mail services
