@@ -35,8 +35,37 @@ New DebOps roles
   Sealing and configures persistent storage of the log files. The role is
   included by default in the :file:`common.yml` playbook.
 
+- The :ref:`debops.dpkg_cleanup` role can create :command:`dpkg` hooks that
+  help clean up custom and diverted files created by other roles when a given
+  Debian package is removed. This should aid in cases of multiple roles
+  managing services that provide the same functionality.
+
+:ref:`debops.resources` role
+''''''''''''''''''''''''''''
+
+- Add support for the ``access_time`` and ``modification_time`` parameters of
+  the Ansible file module to the role.
+
+:ref:`debops.roundcube` role
+''''''''''''''''''''''''''''
+
+- The role can now be configured to install Roundcube from private or internal
+  :command:`git` repositories that might contain additional modifications to
+  the application code required by some organizations. See the
+  :ref:`roundcube__ref_private_repo` section in the documentation for details.
+
 Changed
 ~~~~~~~
+
+Updates of upstream application versions
+''''''''''''''''''''''''''''''''''''''''
+
+- In the :ref:`debops.ipxe` role, the Debian Stretch and Debian Buster netboot
+  installer versions have been updated to their next point releases, 9.11 and
+  10.3 respectively.
+
+- In the :ref:`debops.roundcube` role, the Roundcube version installed by
+  default has been updated to ``v1.4.2``.
 
 General
 '''''''
@@ -46,6 +75,16 @@ General
   The ``debops.debops`` collection will install additional ``debops.rolesXY``
   collections automatically via collection dependencies. The playbooks have
   been updated to include new Collections.
+
+Removed
+~~~~~~~
+
+:ref:`debops.nullmailer` role
+'''''''''''''''''''''''''''''
+
+- The script and :command:`dpkg` hook that cleaned up the additional files
+  maintained by the role has been removed; the :ref:`debops.dpkg_cleanup` role
+  will be used for this purpose instead.
 
 Fixed
 ~~~~~
@@ -94,7 +133,7 @@ General
 :ref:`debops.docker_server` role
 ''''''''''''''''''''''''''''''''
 
-- Add `docker_server__install_virtualenv` setting to disable python virtualvenv installation.
+- Add `docker_server__install_virtualenv` setting to disable python virtualenv installation.
 
 :ref:`debops.gitlab_runner` role
 ''''''''''''''''''''''''''''''''

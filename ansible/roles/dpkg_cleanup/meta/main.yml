@@ -4,29 +4,24 @@ dependencies: []
 
 galaxy_info:
 
+  author: 'Maciej Delmanowski'
+  description: 'Prepare a dpkg cleanup hook executed on package removal'
   company: 'DebOps'
-  author: 'Reto Gantenbein'
-  description: 'Manage Roundcube, a browser-based IMAP client written in PHP'
   license: 'GPL-3.0-only'
   min_ansible_version: '2.9.0'
-
   platforms:
-
     - name: Ubuntu
       versions:
-        - trusty
         - xenial
-        - zesty
-
+        - bionic
     - name: Debian
       versions:
         - jessie
         - stretch
         - buster
-
+        - bullseye
   galaxy_tags:
-    - debops
-    - email
-    - mail
-    - imap
-    - web
+    - cleanup
+    - system
+    - dpkg
+    - apt
