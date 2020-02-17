@@ -153,32 +153,6 @@ telegraf__default_configuration:
   - name: inputs.system
     options: []
 
-  - name: inputs.redis
-    state: 'present'
-    options:
-      - servers: [ 'tcp://localhost:6379' ]
-
-  - name: inputs.nginx
-    state: 'present'
-    options:
-      - urls: [ 'http://localhost/nginx_status' ]
-
-  - name: inputs.varnish
-    state: 'present'
-    options:
-       - stats: [ '*' ]
-
-  - name: inputs.apache
-    state: 'present'
-    options:
-      - urls: [ 'http://localhost:8080/server-status?auto' ]
-
-  - name: inputs.mysql
-    state: 'present'
-    options:
-      - servers: [ 'telegraf:{{ lookup("password", secret + "/mariadb/denner-monitoring/credentials/telegraf/password length=48") }}@tcp(127.0.0.1:3306)/' ]
-        gather_slave_status: true
-
                                                                    # ]]]
 # .. envvar:: telegraf__configuration [[[
 #
@@ -195,3 +169,4 @@ telegraf__combined_configuration: '{{ telegraf__default_configuration + telegraf
 
                                                                    # ]]]
                                                                    # ]]]
+
