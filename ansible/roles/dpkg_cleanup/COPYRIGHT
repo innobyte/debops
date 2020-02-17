@@ -1,7 +1,7 @@
-debops.cryptsetup - Setup and manage encrypted filesystems
+debops.dpkg_cleanup - Prepare a dpkg cleanup hook using Ansible
 
-Copyright (C) 2015-2020 Robin Schneider <ypid@riseup.net>
-Copyright (C) 2015-2020 DebOps https://debops.org/
+Copyright (C) 2020 Maciej Delmanowski <drybjed@gmail.com>
+Copyright (C) 2020 DebOps Project http://debops.org/
 
 This Ansible role is part of DebOps.
 
