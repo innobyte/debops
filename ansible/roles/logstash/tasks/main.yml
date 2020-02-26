@@ -1,0 +1,74 @@
+---
+
+- import_role:
+    name: 'secret'
+
+- import_role:
+    name: 'ansible_plugins'
+
+- name: Install required APT packages
+  package:
+    name: '{{ q("flattened", logstash__base_packages
+                             + logstash__packages) }}'
+    state: 'present'
+  register: logstash__register_packages
+  until: logstash__register_packages is succeeded
+  notify: [ 'Restart logstash' ]
+
+# - name: Detect installed plugins
+#   shell: bin/logstash-plugin list chdir=/usr/share/logstash
+#   changed_when: False
+#   register: logstash_register_installed_plugins
+
+# - name: Install plugins
+#   shell: bin/logstash-plugin install {{ item }} chdir=/usr/share/logstash
+#   when: item not in logstash_register_installed_plugins.stdout_lines
+#   with_items: '{{ logstash__plugins }}'
+#   notify: [ 'Restart logstash' ]
+
+- name: Configure beats cfg file
+  template:
+    src: 'etc/logstash/conf.d/02-beats-input.conf.j2'
+    dest: '{{ logstash__beats_file }}'
+    mode: '0644'
+
+- name: Configure syslog cfg file
+  template:
+    src: 'etc/logstash/conf.d/10-syslog-filter.conf.j2'
+    dest: '{{ logstash__syslog_file }}'
+    mode: '0644'
+
+- name: Configure elasticsearch cfg file
+  template:
+    src: 'etc/logstash/conf.d/30-elasticsearch-output.conf.j2'
+    dest: '{{ logstash__elasticsearch_file }}'
+    mode: '0644'
+# - name: Divert the original logstash configuration file
+#   dpkg_divert:
+#     path: '/etc/logstash/logstash.yml'
+#     state: 'present'
+#     delete: True
+
+# - name: Generate logstash configuration
+#   template:
+#     src: 'etc/logstash/logstash.yml.j2'
+#     dest: '/etc/logstash/logstash.yml'
+#     mode: '0644'
+#   notify: [ 'Restart logstash' ]
+
+- name: Make sure that Ansible local facts directory exists
+  file:
+    path: '/etc/ansible/facts.d'
+    state: 'directory'
+    mode: '0755'
+
+- name: Save logstash local facts
+  template:
+    src: 'etc/ansible/facts.d/logstash.fact.j2'
+    dest: '/etc/ansible/facts.d/logstash.fact'
+    mode: '0755'
+  register: logstash__register_facts
+
+- name: Update Ansible facts if they were modified
+  action: setup
+  when: logstash__register_facts is changed

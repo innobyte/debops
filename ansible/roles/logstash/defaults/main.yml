@@ -1,0 +1,109 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# debops.logstash default variables
+# =================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../../includes/global.rst
+
+
+# Installation, APT packages [[[
+# ------------------------------
+
+# .. envvar:: logstash__base_packages [[[
+#
+# List of APT base packages which are required by the logstash application.
+logstash__base_packages: [ 'logstash' ]
+
+                                                                   # ]]]
+# .. envvar:: logstash__packages [[[
+#
+# List of APT packages which are required by the logstash application.
+logstash__packages: []
+
+                                                                   # ]]]
+logstash__beats_file: '/etc/logstash/conf.d/02-beats-input.conf'
+logstash__syslog_file: '/etc/logstash/conf.d/10-syslog-filter.conf'
+logstash__elasticsearch_file: '/etc/logstash/conf.d/30-elasticsearch-output.conf'
+logstash__plugins: []
+# .. envvar:: logstash__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Logstash service in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+logstash__allow: '0.0.0.0'
+
+                                                                   # ]]]
+# .. envvar:: logstash__port [[[
+#
+# Port number on which this Logstash service listens on.
+logstash__port: '9600'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# Logstash configuration file [[[
+# ------------------------------------
+
+# The variables below define the contents of the
+# :file:`/etc/logstash/logstash.yml` configuration file.
+# See :ref:`logstash__ref_configuration` for the details and configuration
+# syntax.
+
+# .. envvar:: logstash__default_configuration [[[
+#
+# The default configuration options which should be present in the main
+# configuration file.
+logstash__default_configuration: []
+
+                                                                   # ]]]
+# .. envvar:: logstash__configuration [[[
+#
+# List of configuration options defined on all hosts in the Ansible inventory.
+logstash__configuration: []
+
+                                                                   # ]]]
+# .. envvar:: logstash__combined_configuration [[[
+#
+# Actual list of logstash configuration options passed to the configuration
+# template. This list defines the order in which the options from different
+# variables are processed.
+logstash__combined_configuration: '{{ logstash__default_configuration + logstash__configuration }}'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: logstash__ferm__dependent_rules [[[
+#
+# Configuration for the :ref:`debops.ferm` Ansible role.
+logstash__ferm__dependent_rules:
+  - type: 'accept'
+    dport: [ 'logstash' ]
+    saddr: '{{ logstash__allow }}'
+    accept_any: False
+    weight: '40'
+    role: 'logstash'
+
+                                                                   # ]]]
+# .. envvar:: logstash__etc_services__dependent_list [[[
+#
+# Configuration for the :ref:`debops.etc_services` Ansible role.
+logstash__etc_services__dependent_list:
+
+  - name: 'logstash'
+    port: '{{ logstash__port }}'
+
+                                                                   # ]]]
+# .. envvar:: logstash__elastic_co__dependent_packages [[[
+#
+# Configuration for the :ref:`debops.elastic_co` Ansible role.
+logstash__elastic_co__dependent_packages:
+  - '{{ logstash__base_packages }}'
+  - '{{ logstash__packages }}'
+
+                                                                   # ]]]
+                                                                   # ]]]
