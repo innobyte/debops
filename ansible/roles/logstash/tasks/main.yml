@@ -43,6 +43,18 @@
     src: 'etc/logstash/conf.d/30-elasticsearch-output.conf.j2'
     dest: '{{ logstash__elasticsearch_file }}'
     mode: '0644'
+
+- name: Configure nginx input cfg file
+  template:
+    src: 'etc/logstash/conf.d/03-nginx-input.conf.j2'
+    dest: '{{ logstash__elasticsearch_file }}'
+    mode: '0644'
+
+- name: Configure nginx filter cfg file
+  template:
+    src: 'etc/logstash/conf.d/20-nginx-filter.conf.j2'
+    dest: '{{ logstash__elasticsearch_file }}'
+    mode: '0644'
 # - name: Divert the original logstash configuration file
 #   dpkg_divert:
 #     path: '/etc/logstash/logstash.yml'

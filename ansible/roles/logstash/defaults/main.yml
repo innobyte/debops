@@ -28,6 +28,8 @@ logstash__packages: []
 logstash__beats_file: '/etc/logstash/conf.d/02-beats-input.conf'
 logstash__syslog_file: '/etc/logstash/conf.d/10-syslog-filter.conf'
 logstash__elasticsearch_file: '/etc/logstash/conf.d/30-elasticsearch-output.conf'
+logstash__nginx_input_file: '/etc/logstash/conf.d/03-nginx-input.conf'
+logstash__nginx_filter_file: '/etc/logstash/conf.d/20-nginx-filter.conf'
 logstash__plugins: []
 # .. envvar:: logstash__allow [[[
 #
@@ -107,3 +109,7 @@ logstash__elastic_co__dependent_packages:
 
                                                                    # ]]]
                                                                    # ]]]
+#TO DO
+# 30-elastic.. var cu user/pwd
+# logstash.conf cu var pt caile logurilor wanna be monitoring
+# + continutul liniei de mai sus la final
