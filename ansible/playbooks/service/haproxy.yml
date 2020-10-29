@@ -1,0 +1,19 @@
+---
+
+- name: Manage Haproxy
+  hosts: [ 'debops_service_haproxy' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: debops.ferm
+      tags: [ 'role::ferm', 'skip::ferm' ]
+      ferm__dependent_rules:
+        - '{{ haproxy__ferm__dependent_rules }}'
+
+    - role: debops.haproxy
+      tags: [ 'role::haproxy', 'skip::haproxy' ]

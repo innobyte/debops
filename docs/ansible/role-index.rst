@@ -92,6 +92,7 @@ are not accessed directly by end users.
 - :ref:`debops.salt`
 - :ref:`debops.tinyproxy`
 - :ref:`debops.varnish`
+- :ref:`debops.haproxy`
 - ``debops.reprepro``
 - ``debops.sks``
 - ``debops.smstools``
