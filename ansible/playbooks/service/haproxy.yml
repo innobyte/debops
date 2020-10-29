@@ -10,10 +10,10 @@
 
   roles:
 
-    - role: debops.ferm
+    - role: ferm
       tags: [ 'role::ferm', 'skip::ferm' ]
       ferm__dependent_rules:
         - '{{ haproxy__ferm__dependent_rules }}'
 
-    - role: debops.haproxy
+    - role: haproxy
       tags: [ 'role::haproxy', 'skip::haproxy' ]
