@@ -203,7 +203,7 @@ pki_acme_tiny_src: '{{ (ansible_local.root.src
 # .. envvar:: pki_acme_tiny_bin [[[
 #
 # Path where the :program:`acme-tiny` script will be installed.
-pki_acme_tiny_bin: '/usr/local/lib/pki/acme-tiny'
+pki_acme_tiny_bin: '/usr/local/bin/acme-tiny'
 
                                                                    # ]]]
 # .. envvar:: pki_acme_ca [[[
@@ -224,6 +224,19 @@ pki_acme_ca_api_map:
   'le-staging': 'https://acme-staging.api.letsencrypt.org'
   'le-live-v2': 'https://acme-v02.api.letsencrypt.org/directory'
   'le-staging-v2': 'https://acme-staging-v02.api.letsencrypt.org/directory'
+
+                                                                   # ]]]
+# .. envvar:: pki_acme_contacts [[[
+#
+# List of (mailto:) URLs that the ACME server can use to contact you for issues
+# related to your account. For example, the server may wish to notify you about
+# server-initiated revocation or certificate expiration.
+pki_acme_contacts: [ 'mailto:{{ ansible_local.core.admin_public_email[0]
+                                if (ansible_local|d() and
+                                    ansible_local.core|d() and
+                                    ansible_local.core.admin_public_email|d() and
+                                    ansible_local.core.admin_public_email[0]|d())
+                                else "root@" + ansible_domain }}' ]
 
                                                                    # ]]]
 # .. envvar:: pki_acme_challenge_dir [[[
@@ -261,9 +274,13 @@ pki_base_packages: [ 'ssl-cert', 'make', 'ca-certificates',
 # .. envvar:: pki_acme_packages [[[
 #
 # List of APT packages required by ACME support.
-# :program:`acme-tiny` itself is not yet available in Debian Stable.
-# Ref: https://packages.debian.org/source/stretch/acme-tiny
-pki_acme_packages: [ 'curl', 'git' ]
+pki_acme_packages:
+  - 'curl'
+  - 'git'
+  - '{{ [] if (ansible_distribution_release in
+               [ "wheezy", "jessie", "stretch",
+                 "precise", "trusty", "xenial", "bionic" ])
+           else "acme-tiny" }}'
 
                                                                    # ]]]
 # .. envvar:: pki_packages [[[

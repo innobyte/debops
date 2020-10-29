@@ -474,6 +474,13 @@ Locations
 HTTP security headers
 ~~~~~~~~~~~~~~~~~~~~~
 
+``content_type_options``
+  Optional, string. Defaults to ``nosniff``, which indicates to browsers that
+  MIME types advertised in the Content-Type headers should not be changed and be
+  followed. This prevents MIME type sniffing and is the reason why site security
+  testers usually expect this header to be set. Set this variable to
+  ``{{ omit }}`` to exclude the header from all responses.
+
 ``csp``
   Optional, string. Defaults to: ``default-src https: ;`` (force all assets to be loaded over HTTPS).
   Sets the first part of the ``Content-Security-Policy`` header.
@@ -786,6 +793,22 @@ Available when ``item.type`` is set to ``php`` for a server.
   Optional. A string or list with ``try_files`` option values which should be
   defined in the PHP location blocks. If not defined, the default is to use the
   ``$script_name`` and ``=404`` values.
+
+``php_location_script_name``
+  Optional. This parameter allows modification of the location matching rule
+  used for PHP scripts without additional parameters, by default:
+
+  .. code-block:: none
+
+     ~ ^(?!.+\.php/)(?<script_name>.+\.php)$
+
+``php_location_path_info``
+  Optional. This parameter allows modification of the location matching rule
+  used for PHP scripts with additional parameters, by default:
+
+  .. code-block:: none
+
+     ~ ^(?<script_name>.+\.php)(?<path_info>/.*)$
 
 ``php_options``
   Optional, string. Additional options to append to php location.

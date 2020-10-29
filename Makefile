@@ -16,6 +16,11 @@ check: fail-if-git-dirty
 clean:          ## Clean up project directory
 clean: clean-tests clean-sdist clean-wheel
 
+.PHONY: clean-git
+clean-git:      ## Clean up directories and files ignored by git
+clean-git:
+	@git clean -X -d -f
+
 .PHONY: collection
 collection:     ## Build collection of Ansible artifacts with ansible-galaxy
 collection: make-collection
@@ -79,7 +84,7 @@ sdist-sign: sdist
 	@gpg --detach-sign --armor dist/debops-*.tar.gz
 
 .PHONY: make-collection
-make-collection:
+make-collection: clean clean-git
 	@lib/ansible-galaxy/make-collection
 
 .PHONY: clean-sdist
@@ -109,7 +114,7 @@ twine-upload:    ## Upload Python packages to PyPI
 	@twine upload dist/*
 
 .PHONY: test-all
-test-all: clean-tests test-pep8 test-debops-tools test-debops-ansible_plugins test-docs test-man test-playbook-syntax test-yaml test-shell
+test-all: clean-tests test-pep8 test-debops-tools test-debops-ansible_plugins test-docs test-man test-playbook-syntax test-ansible-lint test-yaml test-shell
 
 .PHONY: test-pep8
 test-pep8:
@@ -152,14 +157,15 @@ check-links:
 .PHONY: test-playbook-syntax
 test-playbook-syntax:
 	@printf "%s\n" "Testing Ansible playbook syntax..."
-	@ANSIBLE_ROLES_PATH="ansible/roles" ansible-playbook --syntax-check \
-		ansible/playbooks/bootstrap.yml \
-		ansible/playbooks/site.yml
+	@ANSIBLE_ROLES_PATH="ansible/roles" ANSIBLE_HOST_PATTERN_MISMATCH=ignore \
+	 ansible-playbook --syntax-check ansible/playbooks/bootstrap.yml \
+		                         ansible/playbooks/bootstrap-ldap.yml \
+		                         ansible/playbooks/site.yml
 
 .PHONY: test-ansible-lint
 test-ansible-lint:
 	@printf "%s\n" "Checking Ansible roles using ansible-lint..."
-	@ansible-lint roles/* roles/*/env roles/*/raw ansible/playbooks/*.yml ansible/playbooks/service/*.yml
+	@ansible-lint ansible/roles/*
 
 .PHONY: test-yaml
 test-yaml:

@@ -27,6 +27,7 @@ variables:
   TEST_SCRIPTS: '/vagrant/lib/tests/scripts'
   DEBOPS_PLAYBOOKS:  '/vagrant/ansible/playbooks'
   VAGRANT_DOTFILE_PATH: '/var/tmp/vagrant-dotfile-${CI_JOB_ID}'
+  JANE_DIFF_BASE_BRANCH: 'origin/stable-2.0'
   GIT_STRATEGY: 'clone'
   TERM: 'xterm'
 
@@ -565,12 +566,12 @@ stages:
   <<: *test_role_3rd_deps
   variables:
     JANE_TEST_FACT: 'gitlab.fact'
-    JANE_TEST_PLAY: '${DEBOPS_PLAYBOOKS}/service/redis_server.yml ${DEBOPS_PLAYBOOKS}/service/postgresql_server.yml ${DEBOPS_PLAYBOOKS}/service/gitlab.yml'
+    JANE_TEST_PLAY: '${DEBOPS_PLAYBOOKS}/service/apt.yml ${DEBOPS_PLAYBOOKS}/service/redis_server.yml ${DEBOPS_PLAYBOOKS}/service/postgresql_server.yml ${DEBOPS_PLAYBOOKS}/service/gitlab.yml'
     JANE_INVENTORY_GROUPS: 'debops_service_postgresql_server,debops_service_redis_server,debops_service_gitlab'
     JANE_INVENTORY_HOSTVARS: 'postgresql_server__delegate_to=localhost postgresql__delegate_to=localhost'
     JANE_DIFF_PATTERN: '.*/roles/gitlab/.*'
     JANE_LOG_PATTERN: '\[debops\.gitlab\]'
-    VAGRANT_MASTER_MEMORY: '4096'
+    VAGRANT_MASTER_MEMORY: '6144'
   tags: [ 'shell', 'vagrant-vm', 'mem-6GB' ]
 
 'gitlab_runner role':
@@ -917,8 +918,8 @@ stages:
     JANE_INVENTORY_GROUPS: 'debops_service_lxd'
     JANE_DIFF_PATTERN: '.*/roles/lxd/.*'
     JANE_LOG_PATTERN: '\[debops\.lxd\]'
-    VAGRANT_MASTER_MEMORY: '2048'
-  tags: [ 'shell', 'vagrant-vm' ]
+    VAGRANT_MASTER_MEMORY: '4096'
+  tags: [ 'shell', 'vagrant-vm', 'mem-6GB' ]
 
 
 # --- m --- [[[2

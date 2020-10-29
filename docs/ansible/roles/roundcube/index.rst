@@ -3,8 +3,10 @@
 debops.roundcube
 ================
 
-.. include:: man_description.rst
-   :start-line: 3
+The ``debops.roundcube`` Ansible role manages `Roundcube`__, an IMAP Web client
+written in PHP.
+
+.. __: https://roundcube.net/
 
 .. toctree::
    :maxdepth: 2
@@ -12,12 +14,19 @@ debops.roundcube
    getting-started
    defaults-detailed
    guides
-   defaults/main
 
-Copyright
----------
+.. only:: html
 
-.. literalinclude:: ../../../../ansible/roles/roundcube/COPYRIGHT
+   .. toctree::
+      :maxdepth: 2
+
+      defaults/main
+      ldap-dit
+
+   Copyright
+   ---------
+
+   .. literalinclude:: ../../../../ansible/roles/roundcube/COPYRIGHT
 
 ..
  Local Variables:

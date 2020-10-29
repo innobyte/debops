@@ -166,7 +166,7 @@
 
 - name: Generate Dovecot ldap configuration
   template:
-    src: "{{ lookup('template_src', 'etc/dovecot/{{ item }}.j2') }}"
+    src: "{{ lookup('template_src', 'etc/dovecot/' + item + '.j2') }}"
     dest: '/etc/dovecot/{{ item }}'
     owner: 'root'
     group: 'root'
@@ -209,6 +209,30 @@
     shell: "/usr/sbin/nologin"
     system: yes
   when: "'passwdfile' in dovecot_user_accounts"
+
+- name: Make sure that PKI hook directory exists
+  file:
+    path: '{{ dovecot_pki_hook_path }}'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  when: dovecot_pki|bool
+
+- name: Manage PKI postfix hook
+  template:
+    src: 'etc/pki/hooks/dovecot.j2'
+    dest: '{{ dovecot_pki_hook_path + "/" + dovecot_pki_hook_name }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  when: dovecot_pki|bool
+
+- name: Ensure the PKI postfix hook is absent
+  file:
+    path: '{{ dovecot_pki_hook_path }}'
+    state: 'absent'
+  when: not (dovecot_pki|bool)
 
 - name: Post hooks
   include: "{{ lookup('task_src', 'dovecot/post_main.yml') }}"

@@ -3,6 +3,9 @@
 - import_role:
     name: 'ansible_plugins'
 
+- import_role:
+    name: 'secret'
+
 - name: Configure access to LDAP directory
   template:
     src: 'etc/sudo-ldap.conf.j2'
@@ -29,6 +32,7 @@
     insertafter: 'EOF'
     state: 'present'
     validate: 'visudo -cf "%s"'
+    mode: '0440'
   when: sudo__enabled|bool
 
 - name: Remove sudoers configuration if requested

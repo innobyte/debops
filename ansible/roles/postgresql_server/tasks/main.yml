@@ -35,6 +35,7 @@
     path: '/etc/postgresql-common/createcluster.conf'
     regexp: '^data_directory\s+='
     line: "data_directory = '{{ postgresql_server__data_directory }}/%v/%c'"
+    mode: '0644'
   when: postgresql_server__data_directory != '/var/lib/postgresql'
 
 - name: Make sure that custom PostgreSQL data directory exists
@@ -43,8 +44,17 @@
     state: 'directory'
     owner: '{{ postgresql_server__user }}'
     group: '{{ postgresql_server__group }}'
-    mode: '0755'
+    mode: '0750'
   when: postgresql_server__data_directory != '/var/lib/postgresql'
+
+- name: Make sure that custom PostgreSQL Log directory exists
+  file:
+    path: '{{ postgresql_server__log_directory }}'
+    state: 'directory'
+    owner: '{{ postgresql_server__user }}'
+    group: '{{ postgresql_server__group }}'
+    mode: '0750'
+  when: postgresql_server__log_directory|d()
 
 - name: Count number of currently configured clusters
   set_fact:
