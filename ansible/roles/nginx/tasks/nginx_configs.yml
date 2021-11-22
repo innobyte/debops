@@ -46,6 +46,32 @@
   when: (item.name|d() and item.state|d('present') != 'absent' and
          (item.delete is undefined or not item.delete|bool))
 
+- name: Remove nginx geo if requested
+  file:
+    dest: '/etc/nginx/conf.d/geo_{{ item.name }}.conf'
+    state: 'absent'
+  with_flattened:
+    - '{{ nginx__geo }}'
+    - '{{ nginx__dependent_geo }}'
+  notify: [ 'Test nginx and reload' ]
+  when: (item.name|d() and
+    ((item.state|d() and item.state == 'absent') or
+    (item.delete|d() and item.delete|bool)))
+
+- name: Configure nginx geo
+  template:
+    src: 'etc/nginx/conf.d/geo.conf.j2'
+    dest: '/etc/nginx/conf.d/geo_{{ item.name }}.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  with_flattened:
+    - '{{ nginx__maps }}'
+    - '{{ nginx__dependent_maps }}'
+  notify: [ 'Test nginx and reload' ]
+  when: (item.name|d() and item.state|d('present') != 'absent' and
+    (item.delete is undefined or not item.delete|bool))
+
 - name: Remove nginx upstreams if requested
   file:
     dest: '/etc/nginx/conf.d/upstream_{{ item.name }}.conf'

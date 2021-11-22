@@ -888,6 +888,21 @@ nginx__default_maps:
 nginx__dependent_maps: []
 
                                                                    # ]]]
+# .. envvar:: nginx__maps [[[
+#
+# List of nginx geo definitions
+# Each geo should be defined in it's own hash variable, similar to upstreams
+# and servers
+# https://nginx.org/en/docs/http/ngx_http_geo_module.html
+nginx__geo: []
+
+                                                                   # ]]]
+# .. envvar:: nginx__dependent_geo [[[
+#
+# List of nginx geo defined in Ansible roles
+nginx__dependent_geo: []
+
+                                                                   # ]]]
 # .. envvar:: nginx__upstreams [[[
 #
 # List of nginx upstream definitions
